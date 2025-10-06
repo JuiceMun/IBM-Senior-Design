@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "system_description.schema.json",
+  "title": "System Description (Tight Types)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "system_description": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/component" }
+    },
+    "metadata": {
+      "type": "array",
+      "description": "List of single-key metadata entries (values are strings, per example).",
+      "items": {
+        "type": "object",
+        "minProperties": 1,
+        "maxProperties": 1,
+        "additionalProperties": { "type": "string" }
+      }
+    }
+  },
+  "required": ["system_description"],
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Component identifier." },
+        "type": {
+          "type": "string",
+          "enum": ["service", "database", "connection"],
+          "description": "Component type."
+        },
+        "machine": { "type": "string", "description": "Host/OS or machine label." },
+        "description": { "type": "string", "description": "Human-readable description." },
+        "network_speed": {
+          "type": ["number", "null"],
+          "description": "Network speed/capacity (numeric); null if unspecified."
+        },
+        "messages": {
+          "type": "array",
+          "description": "Zero or more message I/O specifications.",
+          "items": { "$ref": "#/$defs/message" },
+          "default": []
+        },
+        "edges": {
+          "type": "array",
+          "description": "Outgoing edges from this component.",
+          "items": { "$ref": "#/$defs/edge" },
+          "default": []
+        }
+      },
+      "required": ["id", "type", "machine", "description", "messages", "edges"]
+    },
+    "message": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input_type":  { "type": ["string", "null"] },
+        "output_type": { "type": ["string", "null"] },
+        "message_size": { "type": ["number", "null"] }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "to": { "type": "string", "description": "Target component id." },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Weight/cost/percentage (numeric)."
+        }
+      },
+      "required": ["to", "weight"]
+    }
+  }
+}
