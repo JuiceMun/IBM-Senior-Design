@@ -1,0 +1,41 @@
+{
+  "bank_payment_system": {
+    "lambda": null,
+    "beta": null,
+    "entry_points": "Validation",
+    "constraint": {
+      "service_rate_sum": 1.0
+    },
+    "queues": [
+      {
+        "id": "Validation",
+        "service_rate": null,
+        "next_queue": [{ "id": "MessagingQueue", "probability": 100.0 }]
+      },
+      {
+        "id": "MessagingQueue",
+        "service_rate": null,
+        "next_queue": [
+          { "id": "Funds", "probability": 33.4 },
+          { "id": "Compliance", "probability": 33.3 },
+          { "id": "IMSDatabase", "probability": 33.3 }
+        ]
+      },
+      {
+        "id": "Funds",
+        "service_rate": null,
+        "next_queue": [{ "id": "MessagingQueue", "probability": 100.0 }]
+      },
+      {
+        "id": "Compliance",
+        "service_rate": null,
+        "next_queue": [{ "id": "MessagingQueue", "probability": 100.0 }]
+      },
+      {
+        "id": "IMSDatabase",
+        "service_rate": null,
+        "next_queue": [{ "id": "External", "probability": 100.0 }]
+      }
+    ]
+  }
+}
