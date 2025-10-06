@@ -1,0 +1,24 @@
+{
+  "system_description": [
+    {
+      "id": "Validation",
+      "type": "service",
+      "machine": "Windows 10",
+      "description": "Sender and Receiver Validation",
+      "network_speed": null,
+      "messages": [
+        {
+          "input_type": null,
+          "output_type": null,
+          "message_size": null
+        }
+      ],
+      "edges": [
+        { "to": "Messaging_Queue", "weight": 1.0 }
+      ]
+    }
+  ],
+  "metadata": [
+    { "system_version": "v1.0" }
+  ]
+}
