@@ -1,0 +1,121 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "schema.json",
+    "title": "System",
+    "description": "Schema for a system with components, messages, edges, and metadata.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "system_components": {
+            "type": "array",
+            "description": "List of system components.",
+            "items": {
+                "$ref": "#/$defs/component"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "metadata": {
+            "$ref": "#/$defs/metadata"
+        }
+    },
+    "required": [
+        "system_components",
+        "metadata"
+    ],
+    "$defs": {
+        "component": {
+            "type": "object",
+            "description": "A single system component.",
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Component identifier."
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Component type (e.g., service, database)."
+                },
+                "machine": {
+                    "type": "string",
+                    "description": "Host/OS or machine label."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Human-readable description."
+                },
+                "network_speed": {
+                    "type": "string",
+                    "description": "Network speed/capacity."
+                },
+                "messages": {
+                    "$ref": "#/$defs/messages"
+                },
+                "edges": {
+                    "type": "array",
+                    "description": "Outgoing edges from this component.",
+                    "items": {
+                        "$ref": "#/$defs/edge"
+                    }
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ]
+        },
+        "messages": {
+            "type": "object",
+            "description": "Message I/O characteristics for a component.",
+            "additionalProperties": false,
+            "properties": {
+                "input_type": {
+                    "type": "string",
+                    "description": "Input message type."
+                },
+                "output_type": {
+                    "type": "string",
+                    "description": "Output message type."
+                },
+                "message_size": {
+                    "type": "string",
+                    "description": "Typical message size."
+                }
+            }
+        },
+        "edge": {
+            "type": "object",
+            "description": "A connection to another component.",
+            "additionalProperties": false,
+            "properties": {
+                "to": {
+                    "type": "string",
+                    "description": "Target component id."
+                },
+                "weight": {
+                    "type": "string",
+                    "description": "Weight/cost/percentage."
+                }
+            },
+            "required": [
+                "to"
+            ]
+        },
+        "metadata": {
+            "type": "object",
+            "description": "System-level metadata.",
+            "additionalProperties": false,
+            "properties": {
+                "system_versions": {
+                    "type": "string",
+                    "description": "Version string."
+                },
+                "system_count": {
+                    "type": "string",
+                    "description": "Count of systems."
+                }
+            }
+        }
+    }
+}

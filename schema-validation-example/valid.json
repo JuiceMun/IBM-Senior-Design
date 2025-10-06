@@ -1,0 +1,24 @@
+{
+  "system_components": [
+    {
+      "id": "Component Name",
+      "type": "Component Category",
+      "machine": "Operating System",
+      "description": "Description of Component",
+      "network_speed": "Network Speed",
+      "messages": {
+        "input_type": "Input Message",
+        "output_type": "Output Message",
+        "message_size": "Size of Message"
+      },
+      "edges": [{
+        "to": "Destination",
+        "weight": "Chance to Use"
+      }]
+    }
+  ],
+  "metadata": {
+    "system_versions": "System Version",
+    "system_count": "Number of Systems Connected"
+  }
+}
