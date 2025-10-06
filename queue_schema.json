@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "queue_schema.json",
+  "title": "Queue Network Schema",
+  "description": "Schema for a queue network configuration. Note that lambda, beta, and service_rate are optional.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "queue_network": {
+      "type": "object",
+      "properties": {
+        "lambda": {
+          "type": ["number", "null"],
+          "description": "Arrival rate of the system"
+        },
+        "beta": {
+          "type": ["number", "null"],
+          "description": "Response time of the system"
+        },
+        "entry_points": {
+          "type": "string",
+          "description": "The entry queue where requests arrive"
+        },
+        "constraint": {
+          "type": "object",
+          "properties": {
+            "service_rate_sum": {
+              "type": "number",
+              "description": "Sum constraint for all service rates"
+            }
+          },
+          "required": ["entry_points", "service_rate_sum"]
+        },
+        "queues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier of the queue"
+              },
+              "service_rate": {
+                "type": ["number", "null"],
+                "description": "Service rate for this queue"
+              },
+              "next_queue": {
+                "type": "array",
+                "description": "Routing probabilities to the next queues",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Identifier of the next queue or endpoint"
+                    },
+                    "probability": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100,
+                      "description": "Probability (in percent) of routing to this next queue"
+                    }
+                  },
+                  "required": ["id", "probability"]
+                }
+              }
+            },
+            "required": ["id", "next_queue"]
+          }
+        }
+      },
+      "required": ["entry_points", "constraint", "queues"]
+    }
+  },
+  "required": ["queue_network"]
+}
