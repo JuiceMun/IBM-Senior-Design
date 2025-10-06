@@ -1,0 +1,94 @@
+{
+  "nodes": [
+    {
+      "id": "Validation",
+      "station_type": "service",
+      "arrival_rate": null,
+      "service_rate": null,
+      "servers": 1,
+      "machine": "Windows 10",
+      "description": "Sender and Receiver Validation"
+    },
+    {
+      "id": "IMS_DB",
+      "station_type": "database",
+      "arrival_rate": null,
+      "service_rate": null,
+      "servers": 1,
+      "machine": "Windows 10",
+      "description": "IMB Database Update"
+    },
+    {
+      "id": "Compliance",
+      "station_type": "service",
+      "arrival_rate": null,
+      "service_rate": null,
+      "servers": 1,
+      "machine": "Windows 10",
+      "description": "Regulatory Compliance Check"
+    },
+    {
+      "id": "Funds",
+      "station_type": "service",
+      "arrival_rate": null,
+      "service_rate": null,
+      "servers": 1,
+      "machine": "Windows 10",
+      "description": "Funds Availability Check"
+    },
+    {
+      "id": "Messaging_Queue",
+      "station_type": "router",
+      "arrival_rate": null,
+      "service_rate": null,
+      "servers": 1,
+      "machine": "Windows 10",
+      "description": "Interconnects All Components."
+    }
+  ],
+  "edges": [
+    {
+      "from": "Validation",
+      "to": "Messaging_Queue",
+      "prob": 1.0
+    },
+    {
+      "from": "IMS_DB",
+      "to": "Messaging_Queue",
+      "prob": 1.0
+    },
+    {
+      "from": "Compliance",
+      "to": "Messaging_Queue",
+      "prob": 1.0
+    },
+    {
+      "from": "Funds",
+      "to": "Messaging_Queue",
+      "prob": 1.0
+    },
+    {
+      "from": "Messaging_Queue",
+      "to": "IMS_DB",
+      "prob": 0.33
+    },
+    {
+      "from": "Messaging_Queue",
+      "to": "Funds",
+      "prob": 0.33
+    },
+    {
+      "from": "Messaging_Queue",
+      "to": "Compliance",
+      "prob": 0.34
+    }
+  ],
+  "metadata": [
+    {
+      "system_version": "v1.234"
+    },
+    {
+      "system_count": "num_of_systems"
+    }
+  ]
+}

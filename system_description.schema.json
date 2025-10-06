@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "system_description.schema.json",
+  "title": "System Description",
+  "description": "Schema for a system description with components, their messages, and edges.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "system_description": {
+      "type": "array",
+      "description": "List of system components.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/component"
+      }
+    },
+    "metadata": {
+      "type": "array",
+      "description": "List of single-key metadata entries (to match the provided example).",
+      "items": {
+        "type": "object",
+        "minProperties": 1,
+        "maxProperties": 1,
+        "additionalProperties": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "required": [
+    "system_description"
+  ],
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Component identifier."
+        },
+        "type": {
+          "type": "string",
+          "description": "Component type (e.g., service, database, connection)."
+        },
+        "machine": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Host/OS or machine label."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Human-readable description."
+        },
+        "network_speed": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ],
+          "description": "Network speed/capacity value or label."
+        },
+        "messages": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "Zero or more message I/O specifications.",
+          "items": {
+            "$ref": "#/$defs/message"
+          },
+          "default": []
+        },
+        "edges": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "Outgoing edges from this component.",
+          "items": {
+            "$ref": "#/$defs/edge"
+          },
+          "default": []
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
+    },
+    "message": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "output_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message_size": {
+          "type": [
+            "string",
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "to": {
+          "type": "string",
+          "description": "Target component id."
+        },
+        "weight": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "description": "Weight/cost/percentage.",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "to",
+        "weight"
+      ]
+    }
+  }
+}

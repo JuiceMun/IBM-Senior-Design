@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "queueing_network.schema.json",
+  "title": "Queueing Network Description",
+  "description": "Schema for a queueing network with nodes, probabilistic routing edges, and metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      },
+      "default": []
+    },
+    "metadata": {
+      "type": "array",
+      "description": "List of single-key metadata entries (aligned with the system description example).",
+      "items": {
+        "type": "object",
+        "minProperties": 1,
+        "maxProperties": 1,
+        "additionalProperties": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "required": [
+    "nodes"
+  ],
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Node identifier (unique)."
+        },
+        "station_type": {
+          "type": "string",
+          "description": "Station role/type in the network.",
+          "enum": [
+            "source",
+            "queue",
+            "server",
+            "router",
+            "sink",
+            "database",
+            "service",
+            "connection"
+          ]
+        },
+        "arrival_rate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "service_rate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "servers": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        },
+        "capacity": {
+          "type": [
+            "integer",
+            "string",
+            "null"
+          ]
+        },
+        "discipline": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "FCFS",
+            "LCFS",
+            "PS",
+            "SIRO",
+            null
+          ],
+          "default": "FCFS"
+        },
+        "machine": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "station_type"
+      ]
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "prob": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "prob"
+      ]
+    }
+  }
+}
