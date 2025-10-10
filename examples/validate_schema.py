@@ -1,7 +1,7 @@
 # validate.py
+import os
 import json
 from jsonschema import Draft202012Validator
-
 
 def validate_json(instance_path, schema_path) -> list:
     """Validate a JSON file against a JSON Schema.
@@ -123,12 +123,12 @@ def main():
 
     if not errors:
         converted_system = system_to_queue(system_description_paths[0])
+        if os.path.exists("../data/converted") is False:
+            os.makedirs("../data/converted")
         output_path = "../data/converted/converted_queue.json"
         with open(output_path, "w") as f:
             json.dump(converted_system, f, indent=2)
         print(f"Saved converted file to: {output_path}")
-
-
 
 if __name__ == "__main__":
     main()
