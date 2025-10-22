@@ -35,6 +35,10 @@
         },
         "machine": { "type": "string", "description": "Host/OS or machine label." },
         "description": { "type": "string", "description": "Human-readable description." },
+        "delay": {
+          "type": ["number", "null"],
+          "description": "Processing delay/time for network component."
+        },
         "network_speed": {
           "type": ["number", "null"],
           "description": "Network speed/capacity (numeric); null if unspecified."
@@ -52,7 +56,7 @@
           "default": []
         }
       },
-      "required": ["id", "type", "machine", "description", "messages", "edges"]
+      "required": ["id", "type", "machine", "description", "delay", "messages", "edges"]
     },
     "message": {
       "type": "object",
@@ -71,8 +75,10 @@
         "weight": {
           "type": "number",
           "minimum": 0,
+          "maximum": 1,
           "description": "Weight/cost/percentage (numeric)."
-        }
+        },
+        "num_msgs_per_sec": { "type": ["number", "null"] }
       },
       "required": ["to", "weight"]
     }
