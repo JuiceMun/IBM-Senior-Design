@@ -5,6 +5,7 @@
       "type": "service",
       "machine": "Windows 10",
       "description": "Sender and Receiver Validation",
+      "delay": 1.0,
       "network_speed": null,
       "messages": [
         {
