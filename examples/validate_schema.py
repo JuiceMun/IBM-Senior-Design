@@ -132,6 +132,7 @@ def main():
 
     converted = system_to_queue(sd_json) #doesnt account for delay yet
     with open(out_file, 'w') as f:
+
         json.dump(converted,f,indent = 2)
 
 
