@@ -13,7 +13,7 @@ def set_config_value(section: str, key: str, value: str):
     config_dir = Path(__file__).resolve().parent
     config_path = config_dir / "config.ini"
 
-    cfg = ConfigParser(interpolation=ExtendedInterpolation())
+    cfg = ConfigParser(comment_prefixes='/', allow_no_value=True, interpolation=ExtendedInterpolation())
     read_files = cfg.read(config_path)
     if not read_files:
         raise FileNotFoundError(f"config.ini not found at {config_path}")
