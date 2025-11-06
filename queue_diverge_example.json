@@ -1,0 +1,35 @@
+{
+  "system": {
+    "lambda": null,
+    "beta": null,
+    "entry_points": "Q1",
+    "constraint": {
+      "service_rate_sum": 1.0
+    },
+    "queues": [
+      {
+        "id": "Q1",
+        "service_rate": null,
+        "next_queue": [
+          { "id": "Q2", "probability": 50.0 },
+          { "id": "Q3", "probability": 50.0 }
+        ]
+      },
+      {
+        "id": "Q2",
+        "service_rate": null,
+        "next_queue": [{ "id": "Q4", "probability": 100.0 }]
+      },
+      {
+        "id": "Q3",
+        "service_rate": null,
+        "next_queue": [{ "id": "Q4", "probability": 100.0 }]
+      },
+      {
+        "id": "Q4",
+        "service_rate": null,
+        "next_queue": [{ "id": "External", "probability": 100.0 }]
+      }
+    ]
+  }
+}
