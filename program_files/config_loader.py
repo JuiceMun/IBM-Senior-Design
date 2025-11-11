@@ -1,4 +1,3 @@
-# config/config_loader.py
 from configparser import ConfigParser, ExtendedInterpolation
 from pathlib import Path
 
@@ -8,21 +7,23 @@ def get_config() -> ConfigParser:
     Relative paths in config.ini are interpreted relative to the PROJECT ROOT
     (i.e., the parent of the config/ directory).
     """
-    config_dir = Path(__file__).resolve().parent          # .../IBM-Senior-Design/config
-    project_root = config_dir.parent                      # .../IBM-Senior-Design
-    config_path = config_dir / "config.ini"
+    # Get current file's directory: .../project_root/config
+    config_dir = Path(__file__).resolve().parent
+    project_root = config_dir.parent
+    config_path = project_root / "config" / "config.ini"   # <- make sure it works regardless of cwd
 
     cfg = ConfigParser(interpolation=ExtendedInterpolation())
-    read_files = cfg.read(config_path)
-    if not read_files:
+    if not config_path.is_file():
         raise FileNotFoundError(f"config.ini not found at {config_path}")
+
+    cfg.read(config_path)
 
     # Normalize all [paths] entries to absolute paths
     if "paths" in cfg:
         for key, val in list(cfg["paths"].items()):
             p = Path(val).expanduser()
             if not p.is_absolute():
-                p = (project_root / p).resolve()          # <-- use project root, not config_dir
+                p = (project_root / p).resolve()
             cfg["paths"][key] = str(p)
 
     return cfg

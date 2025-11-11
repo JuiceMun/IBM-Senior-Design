@@ -10,10 +10,11 @@ def set_config_value(section: str, key: str, value: str):
     E.g. set_config_value('constraints', 'target_utilization', '0.6') 
          => sets target_utilization to 0.6 in the [constraints] section.
     """
-    config_dir = Path(__file__).resolve().parent
-    config_path = config_dir / "config.ini"
+    script_dir = Path(__file__).parent
+    project_root = script_dir.parent
+    config_path = project_root / "config" / "config.ini"
 
-    cfg = ConfigParser(comment_prefixes='/', allow_no_value=True, interpolation=ExtendedInterpolation())
+    cfg = ConfigParser(interpolation=ExtendedInterpolation())
     read_files = cfg.read(config_path)
     if not read_files:
         raise FileNotFoundError(f"config.ini not found at {config_path}")
