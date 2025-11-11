@@ -1,7 +1,9 @@
 # validate.py
-import os, json, traceback
+import os, json
 from jsonschema import Draft202012Validator
-from config import config_loader
+from program_files import config_loader
+
+
 def validate_json(data_path, schema_path) -> list:
     """Validate a JSON file against a JSON Schema.
        Returns a list of error messages (empty if valid).
