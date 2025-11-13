@@ -58,5 +58,5 @@ def set_config_value(config_name: str, section: str, key: str, value: str) -> No
         cfg.write(fp)
 
 
-cfg = get_config("config.ini")
-set_config_value("config.ini","constraints","target_utilization","0.5")
+cfg = get_config("user_config.ini")
+set_config_value("user_config.ini","constraints","target_utilization","0.5")
