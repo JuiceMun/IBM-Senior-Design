@@ -39,7 +39,8 @@ def assign_service_rates(queue_network: dict):
     queues = queue_network["system"]["queues"]
     constraint = queue_network["system"]["constraint"]["service_rate_sum"]
     n = len(queues)
-    
+
+    np.random.seed(42)
     x = np.random.rand(n)
     nums = (x / x.sum()) * constraint  # Normalize to the value of the constraint
     
@@ -91,3 +92,93 @@ print((0.5*0.4)+((0.5**2)*0.3)+0.1) # k = 2, alpha = 0.5, C = 0.1
 # These 2 should equal to each other 
 print(compute_curr_lambda([0.3], 2, 0.5, 0.1)) # When there is not enough history 
 print(0.5*0.3+0.1) # k = 2, alpha = 0.5, C = 0.1
+
+def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
+    """
+    Generate synthethic datas. 
+
+    Args: 
+        queue_network (dict): The queue network application.
+        main_lambda (int): The starting main_lambda value. 
+        k (float): How long is the dependency of λ is. 
+        alpha (float): How much λ is dependent on the previous time point.
+        C (float): Constant 
+
+    Returns:
+        timeline (dict): Synthetic data.  
+    """
+    system = queue_network["system"]
+    queues = system["queues"]
+    entry_id = system["entry_points"]
+
+    # Initialize backlog and lambda tracking
+    backlog = {q["id"]: 0.0 for q in queues}
+    main_lambdas = []
+    timeline = []
+
+    for t in range(time):
+        curr_time = t + 1
+        print(f"\nTime: {curr_time}")
+
+        # Compute main lambda
+        if curr_time == 1: 
+            curr_main_lambda = main_lambda
+            main_lambdas.append(curr_main_lambda)
+        else: 
+            curr_main_lambda = compute_curr_lambda(main_lambdas, k, alpha, C)
+            main_lambdas.append(curr_main_lambda)
+
+        print("λ_main =", curr_main_lambda)
+
+        # Compute queue lambdas (main λ + backlog)
+        queue_lambdas = {}
+
+        for q in queues:
+            q_id = q["id"]
+            queue_lambdas[q_id] = curr_main_lambda + backlog[q_id] # Setting each queue to main lambda plus any backlog
+    
+        print("Queue λ values:", queue_lambdas)
+
+        # Compute delays  
+        delays = {}
+        
+        for q in queues: 
+            q_id = q["id"]
+            mu = q["service_rate"]
+            lam = queue_lambdas[q_id]
+            delays[q_id] = 1/(mu-lam) 
+
+        # Compute served and update backlog
+        served = {}
+        new_backlog = {}
+
+        for q in queues:
+            q_id = q["id"]
+            mu = q["service_rate"]
+            lam = queue_lambdas[q_id]
+
+            served[q_id] = min(mu, lam)
+            new_backlog[q_id] = max(0, lam - mu)
+
+        backlog = new_backlog
+
+        print("Delays:", delays)
+        print("Served:", served)
+        print("Backlog:", backlog)
+
+        # Record timestep summary
+        timeline.append({
+            "time": curr_time,
+            "lambda_main": curr_main_lambda,
+            "queue_lambdas": queue_lambdas,
+            "served": served, # Evenually remove
+            "backlog": backlog.copy(), # Evenually remove 
+            "delays": delays
+        })
+
+    return timeline
+
+# An example 
+k = 3
+alpha = 0.4
+generate_data(queue_network, 40, 0.1, k, alpha, 0.05)
