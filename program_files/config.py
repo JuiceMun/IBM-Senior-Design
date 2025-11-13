@@ -2,7 +2,7 @@ from configparser import ConfigParser, ExtendedInterpolation
 from pathlib import Path
 
 # ----------------------------
-# helpers
+# Helpers
 # ----------------------------
 def _project_root() -> Path:
     """Absolute path to the project root (parent of program_files/)."""
