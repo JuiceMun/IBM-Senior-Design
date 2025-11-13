@@ -56,7 +56,3 @@ def set_config_value(config_name: str, section: str, key: str, value: str) -> No
 
     with open(_config_path(config_name), "w", encoding="utf-8") as fp:
         cfg.write(fp)
-
-
-cfg = get_config("user_config.ini")
-set_config_value("user_config.ini","constraints","target_utilization","0.5")
