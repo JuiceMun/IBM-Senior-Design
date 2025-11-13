@@ -1,52 +1,62 @@
 from configparser import ConfigParser, ExtendedInterpolation
 from pathlib import Path
 
-def get_config() -> ConfigParser:
-    """
-    Load config/config.ini and normalize [paths] entries to absolute paths.
-    Relative paths in config.ini are interpreted relative to the PROJECT ROOT
-    (i.e., the parent of the config/ directory).
-    """
-    script_dir = Path(__file__).resolve().parent           # .../program_files
-    project_root = script_dir.parent                       # .../IBM-Senior-Design
-    config_path = project_root / "config" / "config.ini"
+# ----------------------------
+# helpers
+# ----------------------------
+def _project_root() -> Path:
+    """Absolute path to the project root (parent of program_files/)."""
+    return Path(__file__).resolve().parent.parent
 
-    if not config_path.is_file():
-        raise FileNotFoundError(f"config.ini not found at {config_path}")
+def _config_path(config_name: str) -> Path:
+    """Absolute path to the desired config file inside /config."""
+    path = _project_root() / "config" / config_name
+    if not path.is_file():
+        raise FileNotFoundError(f"{config_name} not found at {path}")
+    return path
 
+def _load_config(config_name: str) -> ConfigParser:
+    """Load a ConfigParser with ExtendedInterpolation."""
     cfg = ConfigParser(interpolation=ExtendedInterpolation())
-    cfg.read(config_path)
-
-    # Normalize all [paths] entries to absolute paths
-    if "paths" in cfg:
-        for key, val in list(cfg["paths"].items()):
-            p = Path(val).expanduser()
-            if not p.is_absolute():
-                p = (project_root / p).resolve()
-            cfg["paths"][key] = str(p)
-
+    cfg.read(_config_path(config_name))
     return cfg
 
-def set_config_value(section: str, key: str, value: str):
+def _normalize_paths(cfg: ConfigParser) -> None:
+    """Normalize [paths] section entries to absolute paths from project root."""
+    if "paths" not in cfg:
+        return
+    root = _project_root()
+    for key, val in list(cfg["paths"].items()):
+        p = Path(val).expanduser()
+        if not p.is_absolute():
+            p = (root / p).resolve()
+        cfg["paths"][key] = str(p)
+
+# ----------------------------
+# Public
+# ----------------------------
+def get_config(config_name: str) -> ConfigParser:
     """
-    Update a value in config/config.ini (creating the section if needed).
-
-    Example:
-        set_config_value('constraints', 'target_utilization', '0.6')
+    Load config/<config_name> and normalize [paths] entries to absolute paths.
+    Relative paths are interpreted relative to the project root.
     """
-    script_dir = Path(__file__).resolve().parent
-    project_root = script_dir.parent
-    config_path = project_root / "config" / "config.ini"
+    cfg = _load_config(config_name)
+    _normalize_paths(cfg)
+    return cfg
 
-    cfg = ConfigParser(interpolation=ExtendedInterpolation())
-    read_files = cfg.read(config_path)
-    if not read_files:
-        raise FileNotFoundError(f"config.ini not found at {config_path}")
-
+def set_config_value(config_name: str, section: str, key: str, value: str) -> None:
+    """
+    Update a value in config/<config_name> (creating the section if needed) and
+    persist the change to disk.
+    """
+    cfg = _load_config(config_name)
     if section not in cfg:
         cfg.add_section(section)
-
     cfg[section][key] = value
 
-    with open(config_path, "w", encoding="utf-8") as configfile:
-        cfg.write(configfile)
+    with open(_config_path(config_name), "w", encoding="utf-8") as fp:
+        cfg.write(fp)
+
+
+cfg = get_config("config.ini")
+set_config_value("config.ini","constraints","target_utilization","0.5")
