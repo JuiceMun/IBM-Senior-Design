@@ -20,7 +20,7 @@ of the queue.
 5) Add noise to the appropriate values. 
 """
 
-with open('queue_linear_example.json', 'r') as file:
+with open('queue_diverge_example.json', 'r') as file:
     queue_network = json.load(file)
 
 def assign_service_rates(queue_network: dict):
@@ -93,6 +93,35 @@ print((0.5*0.4)+((0.5**2)*0.3)+0.1) # k = 2, alpha = 0.5, C = 0.1
 print(compute_curr_lambda([0.3], 2, 0.5, 0.1)) # When there is not enough history 
 print(0.5*0.3+0.1) # k = 2, alpha = 0.5, C = 0.1
 
+def compute_queue_lambdas(main_lambda, queues, entry_id):
+    """
+    Compute the lambda for each of the queue based on their routing probability 
+    and main lambda. 
+
+    Args: 
+        main_lambda (int): The main lambda entering the queue network.
+        queues (list[dict]): A list of queues, where each queue has a `id`,
+        `service_rate`, and `next_queue` field.
+        entry_id (int): Where the main lambda will enter in the queue. 
+
+    Returns:
+        lambdas (dict): The queue id is the key, and the computed lambda for each queue 
+        are the values. 
+    """
+    lambdas = {q["id"]: 0.0 for q in queues}
+    lambdas[entry_id] = main_lambda
+    
+    for q in queues:
+        q_id = q["id"]
+        for nxt in q["next_queue"]:
+            if nxt["id"] == "External": # Reached end of the queue 
+                break 
+
+            prob = nxt["probability"] / 100.0 # Convert to a probability where between 0 to 1
+            routed = lambdas[q_id] * prob # We already assigned the first queue a lambda value (via entry point)
+            lambdas[nxt["id"]] = lambdas.get(nxt["id"], 0) + routed
+    return lambdas
+
 def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
     """
     Generate synthethic datas. 
@@ -132,11 +161,17 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
 
         # Compute queue lambdas (main λ + backlog)
         queue_lambdas = {}
-
+        """
+        # Old code for linear example...
         for q in queues:
             q_id = q["id"]
             queue_lambdas[q_id] = curr_main_lambda + backlog[q_id] # Setting each queue to main lambda plus any backlog
-    
+        """
+        queue_lambdas = compute_queue_lambdas(curr_main_lambda, queues, entry_id)
+        for q in queues:
+            q_id = q["id"]
+            queue_lambdas[q_id] += backlog[q_id]
+        
         print("Queue λ values:", queue_lambdas)
 
         # Compute delays  
@@ -181,4 +216,4 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
 # An example 
 k = 3
 alpha = 0.4
-generate_data(queue_network, 40, 0.1, k, alpha, 0.05)
+generate_data(queue_network, 10, 0.1, k, alpha, 0.05)
