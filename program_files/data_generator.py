@@ -27,8 +27,7 @@ def assign_service_rates(queue_network: dict):
     Pick random values for service rate (μ). All of the μ_i should 
     follow the constraint in the queue network. 
 
-    Args: 
-        queue_network (dict): The incomplete default queue network application 
+    Args:         queue_network (dict): The incomplete default queue network application
         schema. 
 
     Returns:
