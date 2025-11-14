@@ -157,6 +157,7 @@ def main():
                     "3: data_generator.py\n"
                     )
 
+
         if inp == "1":
             test_config()
         elif inp == "2":
