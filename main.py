@@ -138,6 +138,7 @@ def test_data_conversion():
     elif method == 1:
         queueing_networks = get_files_in_directory("./data/queueing-network")
 
+
         print("Choose a queueing network")
         for i in range(len(queueing_networks)):
             print(f"{i} - {queueing_networks[i]}")
