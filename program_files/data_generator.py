@@ -19,7 +19,7 @@ of the queue.
 5) Add noise to the appropriate values. 
 """
 
-with open('queue_linear_example.json', 'r') as file:
+with open('../data/queueing-network/queue_linear_example.json', 'r') as file:
     queue_network = json.load(file)
 
 def assign_service_rates(queue_network: dict):

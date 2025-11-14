@@ -1,7 +1,9 @@
-# validate.py
-import os, json, traceback
+import os
+import json
 from jsonschema import Draft202012Validator
-from config import config_loader
+from program_files import config
+
+
 def validate_json(data_path, schema_path) -> list:
     """Validate a JSON file against a JSON Schema.
        Returns a list of error messages (empty if valid).
@@ -105,37 +107,48 @@ def queue_to_system(queue_path):
         "metadata": []
     }
 
+
 def main():
-    cfg = config_loader.get_config()
+    # Use the dev configuration (with directories & schema paths only)
+    cfg = config.get_config("dev_config.ini")
 
     sd_schema = cfg.get("paths", "system_description_schema")
-    qn_schema = cfg.get("paths", "queueing_network_schema")
-    sd_json   = cfg.get("paths", "system_description")
-    qn_json   = cfg.get("paths", "queueing_network")
-    out_dir   = cfg.get("paths", "converted_dir")
-    out_file  = cfg.get("paths", "converted_queue_out")
 
-    if True: #Debug - Change to True to see output
-        print("\n[CONFIG]")
-        print("  system_description_schema:", sd_schema, " exists:", os.path.exists(sd_schema))
-        print("  queueing_network_schema  :", qn_schema, " exists:", os.path.exists(qn_schema))
-        print("  system_description JSON  :", sd_json,   " exists:", os.path.exists(sd_json))
-        print("  queueing_network JSON    :", qn_json,   " exists:", os.path.exists(qn_json))
-        print("  output dir               :", out_dir)
-        print("  output file              :", out_file)
+    print("\n[CONFIG]")
+    print("  system_description_schema:", sd_schema, " exists:", os.path.exists(sd_schema))
 
-    errors = validate_json(sd_json,sd_schema)
+    # Let the user choose which System Description JSON to validate/convert
+    system_path = input("\nPath to System Description JSON to validate/convert: ").strip()
+    if not system_path:
+        print("No system description path provided. Exiting.")
+        return
 
-    if len(errors) > 0:
-      print(errors)
-      return;
+    if not os.path.exists(system_path):
+        print(f"File not found: {system_path}")
+        return
 
-    converted = system_to_queue(sd_json) #doesnt account for delay yet
-    with open(out_file, 'w') as f:
+    # Validate
+    errors = validate_json(system_path, sd_schema)
+    if errors:
+        print("\nValidation errors:")
+        for err in errors:
+            print(" -", err)
+        return
 
-        json.dump(converted,f,indent = 2)
+    print("\nValidation successful ✅")
+
+    # Convert System → Queueing Network
+    converted = system_to_queue(system_path)
+
+    out_path = input("\nPath to write converted Queueing Network JSON (leave blank to just print): ").strip()
+    if out_path:
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(converted, f, indent=2)
+        print(f"\nConverted queue network written to: {out_path}")
+    else:
+        print("\nConverted queue network (not saved):")
+        print(json.dumps(converted, indent=2))
 
 
 if __name__ == "__main__":
     main()
-
