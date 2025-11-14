@@ -78,7 +78,23 @@ def test_config():
 
 
 def test_data_conversion():
+    print("Choose a method to test\n"
+          "0 - validate_json()\n"
+          "1 - system_to_queue()\n"
+          "2 - queue_to_system()"
+    )
+    method = input()
+
+    if method == "0":
+        print("Select a schema")
+        schemas = get_files_in_directory("./data/schemas")
+        for i in range(len(schemas)):
+            print(f"{i} - {schemas[i]}")
+        schema = schemas[int(input())]
+
     print_new_section("Data Conversion")
+
+
 
 def test_data_generator():
     print_new_section("Data Generator")
