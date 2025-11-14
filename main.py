@@ -85,8 +85,9 @@ def test_data_conversion():
           "1 - system_to_queue()\n"
           "2 - queue_to_system()\n"))
 
+    project_root = Path(__file__).resolve().parent
+
     if method == 0:
-        project_root = Path(__file__).resolve().parent
 
         # ---- Choose schema (using get_files_in_directory) ----
         print("Choose a schema")
@@ -135,9 +136,33 @@ def test_data_conversion():
 
 
     elif method == 1:
-        return
+        queueing_networks = get_files_in_directory("./data/queueing-network")
+
+        print("Choose a queueing network")
+        for i in range(len(queueing_networks)):
+            print(f"{i} - {queueing_networks[i]}")
+
+        choice = int(input())
+        queueing_network_name = queueing_networks[choice]
+
+        queueing_network_path = (
+                project_root / "data" / "queueing-network" / queueing_network_name
+        ).resolve()
+
+        output = data_conversion.queue_to_system(str(queueing_network_path))
+        print(f"Converted queueing network {queueing_network_name} to {output}")
+
     elif method == 2:
-        return
+        queueing_networks = get_files_in_directory("./data/queueing-network")
+
+        print("Choose a system description")
+        for i in range(len(queueing_networks)):
+            print(f"{i} - {queueing_networks[i]}")
+
+        queueing_network = queueing_networks[int(input())]
+        output = data_conversion.system_to_queue(queueing_network)
+
+        print(f"Converted queueing network {queueing_network} to {output}")
     else:
         input("Invalid Input\n"
               "Press enter to continue\n")
