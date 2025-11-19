@@ -20,7 +20,7 @@ of the queue.
 5) Add noise to the appropriate values. 
 """
 
-with open('queue_diverge_example.json', 'r') as file:
+with open('../data/queueing-network/queue_linear_example.json', 'r') as file:
     queue_network = json.load(file)
 
 def assign_service_rates(queue_network: dict):
@@ -28,8 +28,7 @@ def assign_service_rates(queue_network: dict):
     Pick random values for service rate (μ). All of the μ_i should 
     follow the constraint in the queue network. 
 
-    Args: 
-        queue_network (dict): The incomplete default queue network application 
+    Args:         queue_network (dict): The incomplete default queue network application
         schema. 
 
     Returns:
