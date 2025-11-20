@@ -21,7 +21,7 @@ of the queue.
 5) Add noise to the appropriate values. 
 """
 
-with open('../data/queueing-network/queue_linear_example.json', 'r') as file:
+with open('../data/queueing-network/queue_diverge_example.json', 'r') as file:
     queue_network = json.load(file)
 
 def assign_service_rates(queue_network: dict):
@@ -129,7 +129,7 @@ def compute_queue_lambdas(main_lambda, queues, entry_id):
     for q in queues:
         q_id = q["id"]
         for nxt in q["next_queue"]:
-            if nxt["id"] == "Externel": # Reached end of the queue 
+            if nxt["id"] == "External": # Reached end of the queue 
                 break 
 
             prob = nxt["probability"] / 100.0 # Convert to a probability where between 0 to 1
@@ -240,4 +240,4 @@ def convert_data_to_csv(data, saved_file_name):
 
 # Testing with an example
 data = generate_data(queue_network, 100, 0.1, k, alpha, 0.05)
-convert_data_to_csv(data, "synthetic_outputed_data.csv")
+convert_data_to_csv(data, "diverge_queue_data.csv")

@@ -20,7 +20,7 @@
       {
         "id": "Q3",
         "service_rate": null,
-        "next_queue": [{ "id": "Externel", "probability": 100.0 }]
+        "next_queue": [{ "id": "External", "probability": 100.0 }]
       }
     ]
   }
