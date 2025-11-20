@@ -52,8 +52,7 @@ def assign_service_rates(queue_network: dict):
 
 print(assign_service_rates(queue_network))
 
-# No noise is added as of now. BUT SHOULD BE IMPLEMENTED (prehaps in another function?). 
-# For ease of testing, there's no noise added. 
+# Noise is added in a seperate function.
 def compute_curr_lambda(main_lambdas, k, alpha, C) -> float:
     """
     Compute λ_main for the current timepoint based on previous timepoints. 
@@ -91,6 +90,22 @@ print((0.5*0.4)+((0.5**2)*0.3)+0.1) # k = 2, alpha = 0.5, C = 0.1
 # These 2 should equal to each other 
 print(compute_curr_lambda([0.3], 2, 0.5, 0.1)) # When there is not enough history 
 print(0.5*0.3+0.1) # k = 2, alpha = 0.5, C = 0.1
+
+# Adding noise to computed main lambda 
+def add_gaussian_noise(value, mean=0, std=0.01):
+    """
+    Add Gaussian noise to a numeric value.
+
+    Parameters:
+        value (float): original number
+        mean (float): mean of Gaussian noise (default = 0)
+        std (float): standard deviation of Gaussian noise (default = 0.01)
+
+    Returns:
+        float: value + noise
+    """
+    noise = np.random.normal(mean, std)
+    return value + noise
 
 def compute_queue_lambdas(main_lambda, queues, entry_id):
     """
@@ -154,6 +169,7 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
             main_lambdas.append(curr_main_lambda)
         else: 
             curr_main_lambda = compute_curr_lambda(main_lambdas, k, alpha, C)
+            curr_main_lambda = add_gaussian_noise(curr_main_lambda)
             main_lambdas.append(curr_main_lambda)
 
         print("λ_main =", curr_main_lambda)
@@ -215,4 +231,4 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
 # An example 
 k = 3
 alpha = 0.4
-generate_data(queue_network, 10, 0.1, k, alpha, 0.05)
+print(generate_data(queue_network, 10, 0.1, k, alpha, 0.05))
