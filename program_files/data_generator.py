@@ -128,7 +128,7 @@ def compute_queue_lambdas(main_lambda, queues, entry_id):
     for q in queues:
         q_id = q["id"]
         for nxt in q["next_queue"]:
-            if nxt["id"] == "External": # Reached end of the queue 
+            if nxt["id"] == "Externel": # Reached end of the queue 
                 break 
 
             prob = nxt["probability"] / 100.0 # Convert to a probability where between 0 to 1
