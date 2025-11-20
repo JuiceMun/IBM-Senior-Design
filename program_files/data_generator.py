@@ -1,6 +1,7 @@
 import json
 import csv
 import numpy as np
+import pandas as pd
 
 """
 Note: 
@@ -221,8 +222,8 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
             "time": curr_time,
             "lambda_main": curr_main_lambda,
             "queue_lambdas": queue_lambdas,
-            "served": served, # Evenually remove
-            "backlog": backlog.copy(), # Evenually remove 
+            # "served": served, # Evenually remove
+            # "backlog": backlog.copy(), # Evenually remove 
             "delays": delays
         })
 
@@ -232,3 +233,11 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
 k = 3
 alpha = 0.4
 print(generate_data(queue_network, 10, 0.1, k, alpha, 0.05))
+
+def convert_data_to_csv(data, saved_file_name):
+    df = pd.json_normalize(data)   # Flattens nested dictionaries
+    df.to_csv(saved_file_name, index=False) # Output csv file
+
+# Testing with an example
+data = generate_data(queue_network, 100, 0.1, k, alpha, 0.05)
+convert_data_to_csv(data, "synthetic_outputed_data.csv")
