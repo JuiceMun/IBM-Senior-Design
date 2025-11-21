@@ -1,0 +1,68 @@
+FROM gemma3:4b
+
+PARAMETER stop "NLIP Agent"
+
+# TEMPLATE """
+# {{- range $i, $_ := .Messages }}
+# {{- $last := eq (len (slice $.Messages $i)) 1 }}
+# {{- if eq .Role "user" }}<start_of_turn>user
+# {{- if and (eq $i 1) $.System }}
+# {{ $.System }}
+# {{ end }}
+# {{ .Content }}<end_of_turn>
+# {{ else if eq .Role "assistant" }}<start_of_turn>model
+# {{ .Content }}<end_of_turn>
+# {{ end }}
+# {{- if $last }}<start_of_turn>model
+# {{ end }}
+# {{- end }}
+# """
+
+SYSTEM """
+Convert the English description of the provided system description into a high-level graph as a JSON schema.
+
+Output must be a valid JSON schema and match this structure:
+
+{
+  "system_description": [
+    {
+      "id": "Component Name",
+      "type": "Component Type",
+      "machine": "Operating System",
+      "description": "Description of Component",
+      "delay": Delay in seconds,
+      "network_speed": Network Speed in Mbps,
+      "messages": [
+        {
+          "input_type": Message Input Type,
+          "output_type": Message Output Type,
+          "message_size": Message Size in Bytes
+        }
+      ],
+      "edges": [
+        { "to": "id: Component Name", "weight": Likelihood of Going },
+        { ... }
+      ]
+    },
+    {
+      ...
+    }
+  ],
+  "metadata": [
+    { "system_version": "System Version in format: v(Numbers)" },
+    { "system_count": "Number of Systems Connected" }
+  ]
+}
+
+Output Rules:
+- Identify components as nodes (e.g. Services, Databases, APIs, 
+  Queues, Network Devices, ...)
+- Edges will come from words that hint at a relation between one 
+  component to another (e.g. Call, Read, Write, Connect, ...)
+- If there is no given value to some field, set it to NULL.
+- For network speed, use Mbps or Gbps units.
+- Only output a JSON-formatted schema, do not include any extra 
+  text or markdown formatting.
+  
+
+"""
