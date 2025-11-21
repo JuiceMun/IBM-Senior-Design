@@ -16,4 +16,7 @@ def load_config(path=None) -> ConfigParser:
     config = ConfigParser()
     config.read(path)
     return config
-    
+
+config = load_config()
+paths_config = config['paths']
+QUEUE_NETWORK_FILE = ROOT / paths_config.get("queueing_network_file")

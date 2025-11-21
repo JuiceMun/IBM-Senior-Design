@@ -2,17 +2,23 @@ import json
 import csv
 import numpy as np
 import pandas as pd
-from config_loader import load_config
+from config_loader import load_config, QUEUE_NETWORK_FILE
 
 # Load Data Generation Configurations
 config = load_config()
 data_gen_config = config['data_generation']
-QUEUE_NETWORK_FILE = data_gen_config.get("queue_network_file")
+stress_test_config = config['stress_test_params']
+
+
+# Extract parameters
 ALPHA = data_gen_config.getfloat("alpha")
 K = data_gen_config.getint("k")
 C = data_gen_config.getfloat("C")
 STARTING_MAIN_LAMBDA = data_gen_config.getfloat("starting_main_lambda")
 TIME_POINTS = data_gen_config.getint("time_points")
+GAUSSIAN_MEAN = data_gen_config.getfloat("gaussian_mean")
+GAUSSIAN_STD = data_gen_config.getfloat("gaussian_std")
+SEED = stress_test_config.getint("random_seed")
 
 
 """
@@ -27,7 +33,7 @@ of the queue.
 5) Add noise to the appropriate values. 
 """
 
-with open('../data/queueing-network/queue_diverge_example.json', 'r') as file:
+with open(QUEUE_NETWORK_FILE, 'r') as file:
     queue_network = json.load(file)
 
 def assign_service_rates(queue_network: dict):
@@ -46,7 +52,7 @@ def assign_service_rates(queue_network: dict):
     constraint = queue_network["system"]["constraint"]["service_rate_sum"]
     n = len(queues)
 
-    np.random.seed(42)
+    np.random.seed(SEED)  # For reproducibility
     x = np.random.rand(n)
     nums = (x / x.sum()) * constraint  # Normalize to the value of the constraint
     
@@ -99,7 +105,7 @@ def compute_curr_lambda(main_lambdas, k, alpha, C) -> float:
 # print(0.5*0.3+0.1) # k = 2, alpha = 0.5, C = 0.1
 
 # Adding noise to computed main lambda 
-def add_gaussian_noise(value, mean=0, std=0.01):
+def add_gaussian_noise(value, mean=GAUSSIAN_MEAN, std=GAUSSIAN_STD):
     """
     Add Gaussian noise to a numeric value.
 
@@ -246,5 +252,6 @@ def convert_data_to_csv(data, saved_file_name):
     df.to_csv(saved_file_name, index=False) # Output csv file
 
 # Testing with an example
-data = generate_data(queue_network, 100, 0.1, k, alpha, 0.05)
+# data = generate_data(queue_network, 100, 0.1, k, alpha, 0.05)
+data = generate_data(assign_service_rates(queue_network), TIME_POINTS, STARTING_MAIN_LAMBDA, K, ALPHA, C)
 convert_data_to_csv(data, "diverge_queue_data.csv")
