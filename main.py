@@ -180,6 +180,15 @@ def test_user_input():
         config.set_user_config("user_config.ini", user_config_settings)
     return None
 
+
+
+def test_user_input():
+    print_new_section("System Description (BASE)")
+    user_config_settings = user_input.ask_user()
+    if user_config_settings is not None:
+        config.set_user_config("user_config.ini", user_config_settings)
+    return None
+
 def test_ollama_input():
     print_new_section("System Description (OLLAMA)")
     user_sys_desc = ask_sys_desc()
@@ -206,7 +215,6 @@ def main():
             test_data_conversion()
         elif inp == "3":
             test_data_generator()
-            print("3")
         elif inp == "4":
             test_user_input()
         elif inp == "5":
