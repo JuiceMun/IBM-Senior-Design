@@ -163,6 +163,3 @@ def ask_user() -> UserInput:
     print("\n")
     if user_input is not None: return user_input
     return None
-
-if __name__ == '__main__':
-    ask_user()
