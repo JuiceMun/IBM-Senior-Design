@@ -191,6 +191,7 @@ def test_user_input():
 
 def test_ollama_input():
     print_new_section("System Description (OLLAMA)")
+    print_new_section("PLEASE RUN BEFORE CONTINUING IF YOU HAVEN'T ALREADY:\n\tollama create nlip-test-model -f model/NLIP.Modelfile")
     user_sys_desc = ask_sys_desc()
     print('\n')
     print(user_sys_desc['message']['content'])
