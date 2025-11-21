@@ -2,12 +2,18 @@ import json
 import csv
 import numpy as np
 import pandas as pd
+from config_loader import load_config
 
-"""
-Note: 
-- Later implement a config file that'll set the values of k and alpha
-- An idea to is to output the synthetic data into a csv file
-"""
+# Load Data Generation Configurations
+config = load_config()
+data_gen_config = config['data_generation']
+QUEUE_NETWORK_FILE = data_gen_config.get("queue_network_file")
+ALPHA = data_gen_config.getfloat("alpha")
+K = data_gen_config.getint("k")
+C = data_gen_config.getfloat("C")
+STARTING_MAIN_LAMBDA = data_gen_config.getfloat("starting_main_lambda")
+TIME_POINTS = data_gen_config.getint("time_points")
+
 
 """
 Procedure: 
@@ -47,11 +53,11 @@ def assign_service_rates(queue_network: dict):
     for i, q in enumerate(queues):
         q["service_rate"] = float(nums[i])
     
-    print("Assigned service rates:", nums)
-    print("Sum:", nums.sum()) # Checking to see if it adds up
+    # print("Assigned service rates:", nums)
+    # print("Sum:", nums.sum()) # Checking to see if it adds up
     return queue_network
 
-print(assign_service_rates(queue_network))
+# print(assign_service_rates(queue_network))
 
 # Noise is added in a seperate function.
 def compute_curr_lambda(main_lambdas, k, alpha, C) -> float:
@@ -85,12 +91,12 @@ def compute_curr_lambda(main_lambdas, k, alpha, C) -> float:
     return main_lambda
 
 # These 2 should equal to each other 
-print(compute_curr_lambda([0.2,0.3,0.4], 2, 0.5, 0.1))
-print((0.5*0.4)+((0.5**2)*0.3)+0.1) # k = 2, alpha = 0.5, C = 0.1
+# print(compute_curr_lambda([0.2,0.3,0.4], 2, 0.5, 0.1))
+# print((0.5*0.4)+((0.5**2)*0.3)+0.1) # k = 2, alpha = 0.5, C = 0.1
 
 # These 2 should equal to each other 
-print(compute_curr_lambda([0.3], 2, 0.5, 0.1)) # When there is not enough history 
-print(0.5*0.3+0.1) # k = 2, alpha = 0.5, C = 0.1
+# print(compute_curr_lambda([0.3], 2, 0.5, 0.1)) # When there is not enough history 
+# print(0.5*0.3+0.1) # k = 2, alpha = 0.5, C = 0.1
 
 # Adding noise to computed main lambda 
 def add_gaussian_noise(value, mean=0, std=0.01):
@@ -143,6 +149,7 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
 
     Args: 
         queue_network (dict): The queue network application.
+        time (int): Number of time points to generate data for.
         main_lambda (int): The starting main_lambda value. 
         k (float): How long is the dependency of λ is. 
         alpha (float): How much λ is dependent on the previous time point.
@@ -230,9 +237,9 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
     return timeline
 
 # An example 
-k = 3
-alpha = 0.4
-print(generate_data(queue_network, 10, 0.1, k, alpha, 0.05))
+# k = 3
+# alpha = 0.4
+# print(generate_data(queue_network, 10, 0.1, k, alpha, 0.05))
 
 def convert_data_to_csv(data, saved_file_name):
     df = pd.json_normalize(data)   # Flattens nested dictionaries
