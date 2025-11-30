@@ -180,15 +180,6 @@ def test_user_input():
         config.set_user_config("user_config.ini", user_config_settings)
     return None
 
-
-
-def test_user_input():
-    print_new_section("System Description (BASE)")
-    user_config_settings = user_input.ask_user()
-    if user_config_settings is not None:
-        config.set_user_config("user_config.ini", user_config_settings)
-    return None
-
 def test_ollama_input():
     print_new_section("System Description (OLLAMA)")
     print_new_section("PLEASE RUN BEFORE CONTINUING IF YOU HAVEN'T ALREADY:\n\tollama create nlip-test-model -f model/NLIP.Modelfile")
@@ -207,8 +198,7 @@ def main():
                     "2: data_conversion.py\n"
                     "3: data_generator.py\n"
                     "4: user_input.py\n"
-                    "5: ollama_input.py\n"
-                    "0: exit program\n")
+                    "5: ollama_input.py\n")
 
         if inp == "1":
             test_config()

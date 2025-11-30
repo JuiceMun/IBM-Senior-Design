@@ -2,12 +2,12 @@ import json
 import csv
 import numpy as np
 import pandas as pd
-from config_loader import load_config, QUEUE_NETWORK_FILE
+import config
 
 # Load Data Generation Configurations
-config = load_config()
-data_gen_config = config['data_generation']
-stress_test_config = config['stress_test_params']
+cfg = config.get_config("dev_config.ini")
+data_gen_config = cfg['data_generation']
+stress_test_config = cfg['stress_test_params']
 
 
 # Extract parameters
@@ -19,8 +19,7 @@ TIME_POINTS = data_gen_config.getint("time_points")
 GAUSSIAN_MEAN = data_gen_config.getfloat("gaussian_mean")
 GAUSSIAN_STD = data_gen_config.getfloat("gaussian_std")
 SEED = stress_test_config.getint("random_seed")
-
-
+QUEUE_NETWORK_FILE = cfg.get("paths","queueing_network_file")
 """
 Procedure: 
 1) Obtain a queue network graph.
@@ -255,3 +254,5 @@ def convert_data_to_csv(data, saved_file_name):
 # data = generate_data(queue_network, 100, 0.1, k, alpha, 0.05)
 data = generate_data(assign_service_rates(queue_network), TIME_POINTS, STARTING_MAIN_LAMBDA, K, ALPHA, C)
 convert_data_to_csv(data, "diverge_queue_data.csv")
+
+
