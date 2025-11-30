@@ -1,7 +1,7 @@
-from program_files import config,data_conversion #,data_generator
+from program_files import config,data_conversion,user_input #,data_generator
 from pathlib import Path
 
-
+from program_files.ollama_input import ask_sys_desc
 
 def print_new_section(title:str):
     print(f"\n"
@@ -172,6 +172,31 @@ def test_data_conversion():
 def test_data_generator():
     print_new_section("Data Generator")
 
+
+def test_user_input():
+    print_new_section("System Description (BASE)")
+    user_config_settings = user_input.ask_user()
+    if user_config_settings is not None:
+        config.set_user_config("user_config.ini", user_config_settings)
+    return None
+
+
+
+def test_user_input():
+    print_new_section("System Description (BASE)")
+    user_config_settings = user_input.ask_user()
+    if user_config_settings is not None:
+        config.set_user_config("user_config.ini", user_config_settings)
+    return None
+
+def test_ollama_input():
+    print_new_section("System Description (OLLAMA)")
+    print_new_section("PLEASE RUN BEFORE CONTINUING IF YOU HAVEN'T ALREADY:\n\tollama create nlip-test-model -f model/NLIP.Modelfile")
+    user_sys_desc = ask_sys_desc()
+    print('\n')
+    print(user_sys_desc['message']['content'])
+    print('\n')
+
 def main():
     while True:
         print_new_section("IBM Stress Testing")
@@ -181,8 +206,9 @@ def main():
                     "1: config.py\n"
                     "2: data_conversion.py\n"
                     "3: data_generator.py\n"
-                    )
-
+                    "4: user_input.py\n"
+                    "5: ollama_input.py\n"
+                    "0: exit program\n")
 
         if inp == "1":
             test_config()
@@ -190,6 +216,10 @@ def main():
             test_data_conversion()
         elif inp == "3":
             test_data_generator()
+        elif inp == "4":
+            test_user_input()
+        elif inp == "5":
+            test_ollama_input()
         elif inp == "0":
             print_new_section("Exiting Program")
             break
