@@ -1,4 +1,4 @@
-from program_files import config,data_conversion,user_input, data_generator
+from program_files import config,data_conversion,user_input, data_generator, analyzer
 from pathlib import Path
 
 from program_files.ollama_input import ask_sys_desc
@@ -73,7 +73,7 @@ def test_config():
     else:
         print("Invalid Input")
 
-    input("press enter to continue")
+    input("Press ENTER to continue")
 
 
 
@@ -132,7 +132,7 @@ def test_data_conversion():
         if len(results) == 0:
             print("Valid JSON")
 
-        input("Press enter to continue\n")
+        input("Press ENTER to continue\n")
 
 
     elif method == 1:
@@ -166,13 +166,13 @@ def test_data_conversion():
         print(f"Converted queueing network {queueing_network} to {output}")
     else:
         input("Invalid Input\n"
-              "Press enter to continue\n")
+              "Press ENTER to continue\n")
         return
 
 def test_data_generator():
     print_new_section("Data Generator")
     data_generator.run()
-    input("press enter to continue")
+    input("Press ENTER to continue")
 
 
 def test_user_input():
@@ -190,6 +190,20 @@ def test_ollama_input():
     print(user_sys_desc['message']['content'])
     print('\n')
 
+def test_analyzer():
+    print_new_section("Analyzer")
+
+    cfg = config.get_config("dev_config.ini")
+    processed_data = get_files_in_directory(cfg.get("paths","processed_data_dir"))
+    for i, name in enumerate(processed_data):
+        print(f"{i} - {name}")
+    processed_data_choice = int(input())
+    choice = processed_data[processed_data_choice]
+
+    analyzer.run(choice)
+
+    input("Press ENTER to continue")
+
 def main():
     while True:
         print_new_section("IBM Stress Testing")
@@ -200,7 +214,8 @@ def main():
                     "2: data_conversion.py\n"
                     "3: data_generator.py\n"
                     "4: user_input.py\n"
-                    "5: ollama_input.py\n")
+                    "5: ollama_input.py\n"
+                    "6: analyzer.py\n")
 
         if inp == "1":
             test_config()
@@ -212,6 +227,8 @@ def main():
             test_user_input()
         elif inp == "5":
             test_ollama_input()
+        elif inp == "6":
+            test_analyzer()
         elif inp == "0":
             print_new_section("Exiting Program")
             break

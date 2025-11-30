@@ -255,9 +255,9 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C, gaussian_
 # alpha = 0.4
 # print(generate_data(queue_network, 10, 0.1, k, alpha, 0.05))
 
-def convert_data_to_csv(data, saved_file_name):
+def convert_data_to_csv(data, saved_file_path):
     df = pd.json_normalize(data)   # Flattens nested dictionaries
-    df.to_csv(saved_file_name, index=False) # Output csv file
+    df.to_csv(saved_file_path, index=False) # Output csv file
 
 
 
@@ -294,6 +294,7 @@ def run():
         GAUSSIAN_STD
     )
 
-    saved_file_name = "diverge_queue_data.csv"
-    convert_data_to_csv(data, saved_file_name)
-    print("Saved to ", cfg.get("paths","processed_data_dir"), "\\",saved_file_name)
+    out_dir = cfg.get("paths", "processed_data_dir")
+    out_path = out_dir+"/diverge_queue_data.csv"
+    convert_data_to_csv(data, out_path)
+    print("Saved to ",out_path)
