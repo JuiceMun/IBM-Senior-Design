@@ -1,4 +1,4 @@
-from program_files import config,data_conversion,user_input #,data_generator
+from program_files import config,data_conversion,user_input, data_generator
 from pathlib import Path
 
 from program_files.ollama_input import ask_sys_desc
@@ -171,6 +171,8 @@ def test_data_conversion():
 
 def test_data_generator():
     print_new_section("Data Generator")
+    data_generator.run()
+    input("press enter to continue")
 
 
 def test_user_input():
