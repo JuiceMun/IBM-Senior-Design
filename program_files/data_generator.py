@@ -1,13 +1,13 @@
 import json
-import csv
 import numpy as np
 import pandas as pd
-from config_loader import load_config, QUEUE_NETWORK_FILE
+from program_files import config
 
+"""
 # Load Data Generation Configurations
-config = load_config()
-data_gen_config = config['data_generation']
-stress_test_config = config['stress_test_params']
+cfg = config.get_config("dev_config.ini")
+data_gen_config = cfg['data_generation']
+stress_test_config = cfg['stress_test_params']
 
 
 # Extract parameters
@@ -19,6 +19,13 @@ TIME_POINTS = data_gen_config.getint("time_points")
 GAUSSIAN_MEAN = data_gen_config.getfloat("gaussian_mean")
 GAUSSIAN_STD = data_gen_config.getfloat("gaussian_std")
 SEED = stress_test_config.getint("random_seed")
+QUEUE_NETWORK_FILE = cfg.get("paths","queueing_network_file")
+
+with open(QUEUE_NETWORK_FILE, 'r') as file:
+    queue_network = json.load(file)
+"""
+
+
 
 
 """
@@ -33,16 +40,17 @@ of the queue.
 5) Add noise to the appropriate values. 
 """
 
-with open(QUEUE_NETWORK_FILE, 'r') as file:
-    queue_network = json.load(file)
 
-def assign_service_rates(queue_network: dict):
+
+def assign_service_rates(queue_network: dict, seed:int):
     """
     Pick random values for service rate (μ). All of the μ_i should 
     follow the constraint in the queue network. 
 
-    Args:         queue_network (dict): The incomplete default queue network application
-        schema. 
+    Args:
+        queue_network (dict): The incomplete default queue network application
+        schema.
+        seed (int): the random seed
 
     Returns:
         queue_network (dict): The queue network application will randomly 
@@ -52,7 +60,7 @@ def assign_service_rates(queue_network: dict):
     constraint = queue_network["system"]["constraint"]["service_rate_sum"]
     n = len(queues)
 
-    np.random.seed(SEED)  # For reproducibility
+    np.random.seed(seed)  # For reproducibility
     x = np.random.rand(n)
     nums = (x / x.sum()) * constraint  # Normalize to the value of the constraint
     
@@ -105,7 +113,7 @@ def compute_curr_lambda(main_lambdas, k, alpha, C) -> float:
 # print(0.5*0.3+0.1) # k = 2, alpha = 0.5, C = 0.1
 
 # Adding noise to computed main lambda 
-def add_gaussian_noise(value, mean=GAUSSIAN_MEAN, std=GAUSSIAN_STD):
+def add_gaussian_noise(value:float, mean:float, std:float):
     """
     Add Gaussian noise to a numeric value.
 
@@ -149,7 +157,7 @@ def compute_queue_lambdas(main_lambda, queues, entry_id):
             lambdas[nxt["id"]] = lambdas.get(nxt["id"], 0) + routed
     return lambdas
 
-def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
+def generate_data(queue_network: json, time, main_lambda, k, alpha, C, gaussian_mean:float, gaussian_std:float):
     """
     Generate synthethic datas. 
 
@@ -183,7 +191,7 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
             main_lambdas.append(curr_main_lambda)
         else: 
             curr_main_lambda = compute_curr_lambda(main_lambdas, k, alpha, C)
-            curr_main_lambda = add_gaussian_noise(curr_main_lambda)
+            curr_main_lambda = add_gaussian_noise(curr_main_lambda,gaussian_mean,gaussian_std)
             main_lambdas.append(curr_main_lambda)
 
         print("λ_main =", curr_main_lambda)
@@ -247,11 +255,46 @@ def generate_data(queue_network: json, time, main_lambda, k, alpha, C):
 # alpha = 0.4
 # print(generate_data(queue_network, 10, 0.1, k, alpha, 0.05))
 
-def convert_data_to_csv(data, saved_file_name):
+def convert_data_to_csv(data, saved_file_path):
     df = pd.json_normalize(data)   # Flattens nested dictionaries
-    df.to_csv(saved_file_name, index=False) # Output csv file
+    df.to_csv(saved_file_path, index=False) # Output csv file
 
-# Testing with an example
-# data = generate_data(queue_network, 100, 0.1, k, alpha, 0.05)
-data = generate_data(assign_service_rates(queue_network), TIME_POINTS, STARTING_MAIN_LAMBDA, K, ALPHA, C)
-convert_data_to_csv(data, "diverge_queue_data.csv")
+
+
+def run():
+    # Load Data Generation Configurations
+    cfg = config.get_config("dev_config.ini")
+    data_gen_config = cfg['data_generation']
+    stress_test_config = cfg['stress_test_params']
+
+    # Extract parameters
+    ALPHA = data_gen_config.getfloat("alpha")
+    K = data_gen_config.getint("k")
+    C = data_gen_config.getfloat("C")
+    STARTING_MAIN_LAMBDA = data_gen_config.getfloat("starting_main_lambda")
+    TIME_POINTS = data_gen_config.getint("time_points")
+    GAUSSIAN_MEAN = data_gen_config.getfloat("gaussian_mean")
+    GAUSSIAN_STD = data_gen_config.getfloat("gaussian_std")
+    SEED = stress_test_config.getint("random_seed")
+    QUEUE_NETWORK_FILE = cfg.get("paths", "queueing_network_file")
+
+    with open(QUEUE_NETWORK_FILE, 'r') as file:
+        queue_network = json.load(file)
+
+    # Testing with an example
+    # data = generate_data(queue_network, 100, 0.1, k, alpha, 0.05)
+    data = generate_data(
+        assign_service_rates(queue_network, SEED),
+        TIME_POINTS,
+        STARTING_MAIN_LAMBDA,
+        K,
+        ALPHA,
+        C,
+        GAUSSIAN_MEAN,
+        GAUSSIAN_STD
+    )
+
+    out_dir = cfg.get("paths", "processed_data_dir")
+    out_path = out_dir+"/diverge_queue_data.csv"
+    convert_data_to_csv(data, out_path)
+    print("Saved to ",out_path)
