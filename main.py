@@ -181,21 +181,14 @@ def test_user_input():
     return None
 
 
-
-def test_user_input():
-    print_new_section("System Description (BASE)")
-    user_config_settings = user_input.ask_user()
-    if user_config_settings is not None:
-        config.set_user_config("user_config.ini", user_config_settings)
-    return None
-
 def test_ollama_input():
     print_new_section("System Description (OLLAMA)")
     print_new_section("PLEASE RUN BEFORE CONTINUING IF YOU HAVEN'T ALREADY:\n\tollama create nlip-test-model -f model/NLIP.Modelfile")
     user_sys_desc = ask_sys_desc()
     print('\n')
-    print(user_sys_desc['message']['content'])
+    print(user_sys_desc['message']['content'].replace("```json", "").replace("```", "").replace("NULL", "null").strip())
     print('\n')
+
 
 def main():
     while True:
@@ -226,3 +219,12 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+"""
+MAKE IT SO THAT AFTER AI GENERATES A SYSTEM DESCRIPTION JSON, IT TAKES ANY VALUES FROM USER
+CONFIG THAT ARE NULL, EMPTY, OR INCORRECT AND FILLS THEM IN WITH THE USER CONFIG VALUES.
+
+IMPROVE SYSTEM PROMPT TO MAKE JSON MORE ACCURATE AND BETTER.
+"""
+
+"I have a systems with two components, a database and a component that calls to that database and gets information back."

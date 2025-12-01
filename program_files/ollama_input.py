@@ -2,23 +2,86 @@ from ollama import chat
 from ollama import ChatResponse
 import json
 import time
+from program_files.config import get_config
+from program_files.data_conversion import validate_json
+from pathlib import Path
 
 def ask_sys_desc():
     """
         Asks user for a system description and uses an Ollama model to translate 
-        that description to JSON. 
+        that description to JSON, fills in certain null values with config defaults,
+        writes JSON to file and validates it, and returns the original model response. 
     """
     sys_desc = input("Input your system description:\n")
+    time.sleep(1)
+    print("Generating system description JSON in data/system-description folder...\n")
     response: ChatResponse = chat(model="nlip-test-model", messages=[
         {
             'role': 'user',
             'content': sys_desc
         }
     ])
-    clean_output = response['message']['content'].replace("```json", "").replace("```", "").strip()
-    data = clean_output.replace("NULL", "null")
-    data = json.loads(data)
-    json_file_path = "./data/system-description/" + str(time.strftime('%Y-%m-%d', time.localtime()) + ".json")
-    with open(json_file_path, 'w') as json_file:
+    clean_output = response['message']['content'].replace("```json", "").replace("```", "").replace("NULL", "null").strip()
+    parsed = json.loads(clean_output)
+
+    if isinstance(parsed, list):
+        data = {"system_description": parsed}
+    elif isinstance(parsed, dict):
+        if "system_description" in parsed and isinstance(parsed["system_description"], list):
+            data = parsed
+        elif parsed.get("id") is not None or parsed.get("edges") is not None:
+            data = {"system_description": [parsed]}
+        else:
+            data = parsed
+    else:
+        data = {"system_description": []}
+
+    config = get_config("user_config.ini")
+    comps = data.get("system_description") or []
+
+    try:
+        default_msg_size = config.getint('constraints', 'avg_message_size_bytes')
+    except Exception:
+        default_msg_size = None
+
+    for comp in comps:
+        if comp.get("network_speed") in (None, ""):
+            try:
+                comp["network_speed"] = config.getint('test_system', 'network_bandwidth_mbps')
+            except Exception:
+                comp["network_speed"] = None
+
+        msgs = comp.get("messages")
+        if isinstance(msgs, dict):
+            if msgs.get("message_size") in (None, ""):
+                msgs["message_size"] = default_msg_size
+            comp["messages"] = msgs
+        elif isinstance(msgs, list):
+            if not msgs:
+                comp["messages"] = [{"message_size": default_msg_size}] if default_msg_size is not None else []
+            else:
+                for m in msgs:
+                    if isinstance(m, dict):
+                        if m.get("message_size") in (None, ""):
+                            m["message_size"] = default_msg_size
+                comp["messages"] = msgs
+        else:
+            comp["messages"] = {"message_size": default_msg_size} if default_msg_size is not None else {}
+
+    out_dir = Path("./data/system-description/")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    json_file_path = str(out_dir / (time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime()) + ".json"))
+
+    # Write file
+    with open(json_file_path, 'w', encoding='utf-8') as json_file:
         json.dump(data, json_file, indent=2)
+
+    # Validate using schema
+    schema_path = Path(__file__).resolve().parent / "data" / "schemas" / "system_description.schema.json"
+    results = validate_json(json_file_path, schema_path)
+    for result in results:
+        print(result)
+    if len(results) == 0:
+        print("Valid JSON")
+
     return response
