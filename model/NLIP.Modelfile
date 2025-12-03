@@ -26,21 +26,24 @@ Output must be a valid JSON schema and match this structure:
 {
   "system_description": [
     {
-      "id": "Component Name",
-      "type": "Component Type",
-      "machine": "Operating System",
-      "description": "Description of Component",
-      "delay": Delay in seconds,
-      "network_speed": Network Speed in Mbps,
+      "id": "Component Name" (type: string),
+      "type": "service" | "database" | "connection" (type: string),
+      "machine": "Operating System" (type: string),
+      "description": "Description of Component" (type: string),
+      "delay": Delay in seconds (type: number | null),
+      "network_speed": Network Speed in Mbps (type: number | null),
       "messages": [
         {
-          "input_type": Message Input Type,
-          "output_type": Message Output Type,
-          "message_size": Message Size in Bytes
+          "input_type": Message Input Type (type: string | null),
+          "output_type": Message Output Type (type: string | null),
+          "message_size": Message Size in Bytes (type: number | null)
         }
       ],
       "edges": [
-        { "to": "id: Component Name", "weight": Likelihood of Going },
+        { 
+          "to": "Same as Component id", 
+          "weight": Likelihood of Going To (type: number | null)
+        },
         { ... }
       ]
     },
@@ -49,8 +52,9 @@ Output must be a valid JSON schema and match this structure:
     }
   ],
   "metadata": [
-    { "system_version": "System Version in format: v(Numbers)" },
-    { "system_count": "Number of Systems Connected" }
+    { "system_version": "System Version in format: v(Numbers)" (type: string) },
+    { "system_count": "Number of Systems Connected" (type: string) },
+    { ... }
   ]
 }
 
@@ -59,10 +63,10 @@ Output Rules:
   Queues, Network Devices, ...)
 - Edges will come from words that hint at a relation between one 
   component to another (e.g. Call, Read, Write, Connect, ...)
+- Edges for each component must add up to 1.0.
 - If there is no given value to some field, set it to NULL.
+- Do not make up values if they haven't been explicitly stated.
 - For network speed, use Mbps or Gbps units.
 - Only output a JSON-formatted schema, do not include any extra 
   text or markdown formatting.
-  
-
 """

@@ -1,7 +1,5 @@
-from program_files import config,data_conversion,user_input, data_generator, analyzer
+from program_files import config, data_conversion, user_input, data_generator, analyzer, ollama_input
 from pathlib import Path
-
-from program_files.ollama_input import ask_sys_desc
 
 def print_new_section(title:str):
     print(f"\n"
@@ -74,8 +72,6 @@ def test_config():
         print("Invalid Input")
 
     input("Press ENTER to continue")
-
-
 
 def test_data_conversion():
     print_new_section("Data Conversion")
@@ -174,7 +170,6 @@ def test_data_generator():
     data_generator.run()
     input("Press ENTER to continue")
 
-
 def test_user_input():
     print_new_section("System Description (BASE)")
     user_config_settings = user_input.ask_user()
@@ -185,9 +180,9 @@ def test_user_input():
 def test_ollama_input():
     print_new_section("System Description (OLLAMA)")
     print_new_section("PLEASE RUN BEFORE CONTINUING IF YOU HAVEN'T ALREADY:\n\tollama create nlip-test-model -f model/NLIP.Modelfile")
-    user_sys_desc = ask_sys_desc()
+    user_sys_desc = ollama_input.ask_sys_desc()
     print('\n')
-    print(user_sys_desc['message']['content'])
+    print(user_sys_desc['message']['content'].replace("```json", "").replace("```", "").replace("NULL", "null").strip())
     print('\n')
 
 def test_analyzer():
