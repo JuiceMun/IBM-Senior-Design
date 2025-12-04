@@ -2,7 +2,7 @@ from ollama import chat
 from ollama import ChatResponse
 import json
 import time
-from program_files.config import get_config
+from program_files.config import _project_root, get_config
 from program_files.data_conversion import validate_json
 from pathlib import Path
 
@@ -14,7 +14,7 @@ def ask_sys_desc():
     """
     sys_desc = input("Input your system description:\n")
     time.sleep(1)
-    print("Generating system description JSON in data/system-description folder...\n")
+    print("\nGenerating system description JSON in data/system-description folder...\n")
     response: ChatResponse = chat(model="nlip-test-model", messages=[
         {
             'role': 'user',
@@ -77,11 +77,11 @@ def ask_sys_desc():
         json.dump(data, json_file, indent=2)
 
     # Validate using schema
-    schema_path = Path(__file__).resolve().parent / "data" / "schemas" / "system_description.schema.json"
+    schema_path = _project_root() / "data" / "schemas" / "system_description.schema.json"
     results = validate_json(json_file_path, schema_path)
     for result in results:
         print(result)
     if len(results) == 0:
-        print("Valid JSON")
+        print("System Description JSON is Valid...")
 
     return response
