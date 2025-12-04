@@ -183,7 +183,6 @@ def test_ollama_input():
     user_sys_desc = ollama_input.ask_sys_desc()
     print("System Description JSON Schema created in the 'data/system-description' folder!")
     print('\n')
-    print('==================')
 
 def test_analyzer():
     print_new_section("Analyzer")

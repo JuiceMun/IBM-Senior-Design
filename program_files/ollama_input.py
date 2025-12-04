@@ -82,6 +82,6 @@ def ask_sys_desc():
     for result in results:
         print(result)
     if len(results) == 0:
-        print("System Description JSON is Valid...")
+        print("System Description JSON is Valid...\n")
 
     return response
