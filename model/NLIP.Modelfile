@@ -27,9 +27,9 @@ Output must be a valid JSON schema and match this structure:
   "system_description": [
     {
       "id": "Component Name" (type: string),
-      "type": "service" | "database" | "connection" (type: string),
-      "machine": "Operating System" (type: string),
-      "description": "Description of Component" (type: string),
+      "type": "service" | "database" | "connection" | "unknown" (type: string),
+      "machine": "Operating System" | "unknown" (type: string),
+      "description": "Description of Component" | "unknown" (type: string),
       "delay": Delay in seconds (type: number | null),
       "network_speed": Network Speed in Mbps (type: number | null),
       "messages": [
@@ -41,7 +41,7 @@ Output must be a valid JSON schema and match this structure:
       ],
       "edges": [
         { 
-          "to": "Same as Component id", 
+          "to": "Same as Component id" | "unknown" (type: string), 
           "weight": Likelihood of Going To (type: number | null)
         },
         { ... }
@@ -52,20 +52,20 @@ Output must be a valid JSON schema and match this structure:
     }
   ],
   "metadata": [
-    { "system_version": "System Version in format: v(Numbers)" (type: string) },
-    { "system_count": "Number of Systems Connected" (type: string) },
+    { "system_version": "System Version in format: v(Numbers)" | "unknown" (type: string) },
+    { "system_count": "Number of Systems Connected" | "unknown" (type: string) },
     { ... }
   ]
 }
 
 Output Rules:
+- DO NOT MAKE UP VALUES FOR THE SCHEMA UNLESS THEY HAVE BEEN EXPLICITLY STATED.
 - Identify components as nodes (e.g. Services, Databases, APIs, 
   Queues, Network Devices, ...)
 - Edges will come from words that hint at a relation between one 
   component to another (e.g. Call, Read, Write, Connect, ...)
 - Edges for each component must add up to 1.0.
 - If there is no given value to some field, set it to NULL.
-- Do not make up values if they haven't been explicitly stated.
 - For network speed, use Mbps or Gbps units.
 - Only output a JSON-formatted schema, do not include any extra 
   text or markdown formatting.
