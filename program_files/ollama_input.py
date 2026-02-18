@@ -13,75 +13,80 @@ def ask_sys_desc():
         writes JSON to file and validates it, and returns the original model response. 
     """
     sys_desc = input("Input your system description:\n")
-    time.sleep(1)
-    print("\nGenerating system description JSON in data/system-description folder...\n")
-    response: ChatResponse = chat(model="nlip-test-model", messages=[
-        {
-            'role': 'user',
-            'content': sys_desc
-        }
-    ])
-    clean_output = response['message']['content'].replace("```json", "").replace("```", "").replace("NULL", "null").strip()
-    parsed = json.loads(clean_output)
+    json_check = True
+    while json_check:
+        print("\nGenerating system description JSON in data/system-description folder...\n")
+        time.sleep(1)
+        response: ChatResponse = chat(model="nlip-test-model", messages=[
+            {
+                'role': 'user',
+                'content': sys_desc
+            }
+        ])
+        clean_output = response['message']['content'].replace("```json", "").replace("```", "").replace("NULL", "null").strip()
+        parsed = json.loads(clean_output)
 
-    if isinstance(parsed, list):
-        data = {"system_description": parsed}
-    elif isinstance(parsed, dict):
-        if "system_description" in parsed and isinstance(parsed["system_description"], list):
-            data = parsed
-        elif parsed.get("id") is not None or parsed.get("edges") is not None:
-            data = {"system_description": [parsed]}
-        else:
-            data = parsed
-    else:
-        data = {"system_description": []}
-
-    config = get_config("user_config.ini")
-    comps = data.get("system_description") or []
-
-    try:
-        default_msg_size = config.getint('constraints', 'avg_message_size_bytes')
-    except Exception:
-        default_msg_size = None
-
-    for comp in comps:
-        if comp.get("network_speed") in (None, ""):
-            try:
-                comp["network_speed"] = config.getint('test_system', 'network_bandwidth_mbps')
-            except Exception:
-                comp["network_speed"] = None
-
-        msgs = comp.get("messages")
-        if isinstance(msgs, dict):
-            if msgs.get("message_size") in (None, ""):
-                msgs["message_size"] = default_msg_size
-            comp["messages"] = msgs
-        elif isinstance(msgs, list):
-            if not msgs:
-                comp["messages"] = [{"message_size": default_msg_size}] if default_msg_size is not None else []
+        if isinstance(parsed, list):
+            data = {"system_description": parsed}
+        elif isinstance(parsed, dict):
+            if "system_description" in parsed and isinstance(parsed["system_description"], list):
+                data = parsed
+            elif parsed.get("id") is not None or parsed.get("edges") is not None:
+                data = {"system_description": [parsed]}
             else:
-                for m in msgs:
-                    if isinstance(m, dict):
-                        if m.get("message_size") in (None, ""):
-                            m["message_size"] = default_msg_size
-                comp["messages"] = msgs
+                data = parsed
         else:
-            comp["messages"] = {"message_size": default_msg_size} if default_msg_size is not None else {}
+            data = {"system_description": []}
 
-    out_dir = Path("./data/system-description/")
-    out_dir.mkdir(parents=True, exist_ok=True)
-    json_file_path = str(out_dir / (time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime()) + ".json"))
+        config = get_config("user_config.ini")
+        comps = data.get("system_description") or []
 
-    # Write file
-    with open(json_file_path, 'w', encoding='utf-8') as json_file:
-        json.dump(data, json_file, indent=2)
+        try:
+            default_msg_size = config.getint('constraints', 'avg_message_size_bytes')
+        except Exception:
+            default_msg_size = None
 
-    # Validate using schema
-    schema_path = _project_root() / "data" / "schemas" / "system_description.schema.json"
-    results = validate_json(json_file_path, schema_path)
-    for result in results:
-        print(result)
-    if len(results) == 0:
-        print("System Description JSON is Valid...\n")
+        for comp in comps:
+            if comp.get("network_speed") in (None, ""):
+                try:
+                    comp["network_speed"] = config.getint('test_system', 'network_bandwidth_mbps')
+                except Exception:
+                    comp["network_speed"] = None
+
+            msgs = comp.get("messages")
+            if isinstance(msgs, dict):
+                if msgs.get("message_size") in (None, ""):
+                    msgs["message_size"] = default_msg_size
+                comp["messages"] = msgs
+            elif isinstance(msgs, list):
+                if not msgs:
+                    comp["messages"] = [{"message_size": default_msg_size}] if default_msg_size is not None else []
+                else:
+                    for m in msgs:
+                        if isinstance(m, dict):
+                            if m.get("message_size") in (None, ""):
+                                m["message_size"] = default_msg_size
+                    comp["messages"] = msgs
+            else:
+                comp["messages"] = {"message_size": default_msg_size} if default_msg_size is not None else {}
+
+        out_dir = Path("./data/system-description/")
+        out_dir.mkdir(parents=True, exist_ok=True)
+        json_file_path = str(out_dir / (time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime()) + ".json"))
+
+        # Write file
+        with open(json_file_path, 'w', encoding='utf-8') as json_file:
+            json.dump(data, json_file, indent=2)
+
+        # Validate using schema
+        schema_path = _project_root() / "data" / "schemas" / "system_description.schema.json"
+        results = validate_json(json_file_path, schema_path)
+        for result in results:
+            print(result)
+        if len(results) == 0:
+            print("System Description JSON is Valid...\n")
+            json_check = False
+        else:
+            print("System Description JSON creation failed. Trying again...\n")
 
     return response
