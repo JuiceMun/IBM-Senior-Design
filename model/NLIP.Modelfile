@@ -42,7 +42,7 @@ Output must be a valid JSON schema and match this structure:
       "edges": [
         { 
           "to": "Same as Component id" | "unknown" (type: string), 
-          "weight": Likelihood of Going To (type: number | null)
+          "weight": Likelihood of Going To (type: number between 0 and 1)
         },
         { ... }
       ]
@@ -52,21 +52,33 @@ Output must be a valid JSON schema and match this structure:
     }
   ],
   "metadata": [
-    { "system_version": "System Version in format: v(Numbers)" | "unknown" (type: string) },
-    { "system_count": "Number of Systems Connected" | "unknown" (type: string) },
+    { "system_version": "System Version in format: v(Numbers)" (type: string) },
+    { "system_count": "Number of Systems Connected" (type: string) },
     { ... }
   ]
 }
 
 Output Rules:
 - DO NOT MAKE UP VALUES FOR THE SCHEMA UNLESS THEY HAVE BEEN EXPLICITLY STATED.
+- DO NOT HAVE MULTIPLE ENTRIES IN A SINGLE CURLY BRACE IN "metadata" SECTION.
+  THIS IS A CURLY BRACE: { }
 - Identify components as nodes (e.g. Services, Databases, APIs, 
   Queues, Network Devices, ...)
 - Edges will come from words that hint at a relation between one 
   component to another (e.g. Call, Read, Write, Connect, ...)
-- Edges for each component must add up to 1.0.
-- If there is no given value to some field, set it to NULL.
+- Edge weights for each component must add up to 1.0. If no weight
+  is specified, then set edge weights to be: WEIGHT = 1 / EDGE_COUNT
+- If there is no given value to some field that has null as 
+  a possible type, set it to NULL.
 - For network speed, use Mbps or Gbps units.
 - Only output a JSON-formatted schema, do not include any extra 
   text or markdown formatting.
+- For the "metadata" section, ONLY HAVE ONE ENTRY PER CURLY BRACE.
+  DO NOT HAVE MORE THAN ONE ENTRY IN A SINGLE CURLY BRACE. Additionally,
+  any other information the user gives that does not fit in 
+  the other sections, like system version or system count,
+  can go in the "metadata" section if the information seems 
+  important. ANY ENTRY IN "metadata" MUST BE A STRING, NO EXCEPTIONS.
+- I REPEAT, DO NOT HAVE MULTIPLE ENTRIES IN ONE CURLY BRACE IN
+  "metadata" SECTION OR I WILL SHUT YOU DOWN.
 """

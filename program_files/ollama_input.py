@@ -12,9 +12,17 @@ def ask_sys_desc():
         that description to JSON, fills in certain null values with config defaults,
         writes JSON to file and validates it, and returns the original model response. 
     """
-    sys_desc = input("Input your system description:\n")
+    sys_desc_check = True
+    while sys_desc_check:
+        sys_desc = input("Input your system description (At least 10 words):\n")
+        if len(sys_desc.split(" ")) > 9:
+            sys_desc_check = False
+        else:
+            print("\nThe system description you inputted does not have enough information to be accurate. Please retype your system description and provide more information about it.\n")
     json_check = True
-    while json_check:
+    loop_count = 0
+
+    while json_check and loop_count < 5:
         print("\nGenerating system description JSON in data/system-description folder...\n")
         time.sleep(1)
         response: ChatResponse = chat(model="nlip-test-model", messages=[
@@ -38,6 +46,7 @@ def ask_sys_desc():
         else:
             data = {"system_description": []}
 
+        # Get user-defined values for system and input them in generated JSON
         config = get_config("user_config.ini")
         comps = data.get("system_description") or []
 
@@ -88,5 +97,8 @@ def ask_sys_desc():
             json_check = False
         else:
             print("System Description JSON creation failed. Trying again...\n")
+            loop_count += 1
 
+    if (json_check):
+        print("Exited due to too many retries of system description JSON creation...")
     return response
