@@ -148,4 +148,3 @@ def queue_to_system(queue_path: str) -> str:
         json.dump(result, f, indent=2)
 
     return str(out_path)
-
