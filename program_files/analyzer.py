@@ -241,7 +241,7 @@ def run(csv_file_name:str):
         routing=routing,
         source_queue=source_queue
     )
-
+    #printing out evrything
     print("\n--- Maximum System Capacity ---")
     print(f"Maximum safe λ_main: {max_lambda:.4f}")
     print(f"System Bottleneck at Capacity: {bottleneck_queue}")
