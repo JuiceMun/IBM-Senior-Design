@@ -4,6 +4,19 @@ from typing import Any, Dict, List, Tuple # for type hints
 
 EXTERNAL_NODE_ID = "External"
 
+def apply_defaults(model: Dict[str, Any], assumptions: List[str]) -> None:
+    """Apply any default values to the model and record assumptions made."""
+    queues = model.get("queues", [])
+
+    if not queues:
+        return
+    
+    # Infer entry point if missing
+    entry_points = model.get("entry_points")
+    if not entry_points:
+        inferred_entry = queues[0]["id"]
+        model["entry_points"] = inferred_entry
+        assumptions.append(f"No entry point defined, assuming '{inferred_entry}' is the entry point.")
 
 def validate(model: Dict[str, Any]) -> List[str]:
     """Check logical rules and return a list of error messages. If the list is empty, the model is valid."""
@@ -18,7 +31,7 @@ def validate(model: Dict[str, Any]) -> List[str]:
         errors.append("Duplicate queue IDs found")
 
     # Check if entry queue IDs are valid
-    entry_points = model.get("entry_points", [])
+    entry_points = model.get("entry_points")
     if not entry_points:
         errors.append("No entry points defined")
     elif entry_points not in queue_ids:
@@ -45,10 +58,11 @@ def validate(model: Dict[str, Any]) -> List[str]:
     # Check if probabilities sum to 100 for each queue
     for queue in queues:
         next_queues = queue.get("next_queue", [])
-        total_prob = sum(next_queue.get("probability", 0) for next_queue in next_queues)
-        if total_prob != 100:
-            errors.append(f"Routing probabilities for queue '{queue['id']}' sum to {total_prob} instead of 100.")
-    
+        if next_queues:
+            total_prob = sum(next_queue.get("probability", 0) for next_queue in next_queues)
+            if total_prob != 100:
+                errors.append(f"Routing probabilities for queue '{queue['id']}' sum to {total_prob} instead of 100.")
+        
     return errors
 
 def enforce(doc: Dict[str, Any]) -> Dict[str, Any]:
@@ -59,6 +73,7 @@ def enforce(doc: Dict[str, Any]) -> Dict[str, Any]:
         model = get_model(doc)
     except Exception as e:
         return {"status": "error", "errors": [str(e)]}
+    apply_defaults(model, assumptions)
     errors = validate(model)
 
     if errors:
