@@ -2,7 +2,8 @@
 import json
 from validation import enforce
 
-with open("./data/queueing-network/queue_diverge_example.json") as f:
+# Open a sample queueing network JSON file and validate it
+with open("../data/queueing-network/queue_diverge_example.json") as f:
     doc = json.load(f)
 
 result = enforce(doc)

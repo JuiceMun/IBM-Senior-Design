@@ -1,10 +1,8 @@
 '''Validation of queue network conversions before sending to data generator'''
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple # for type hints
 
-from annotated_types import doc # for type annotations
-
-EXTERNAL_NODE_ID = "external"
+EXTERNAL_NODE_ID = "External"
 
 
 def validate(model: Dict[str, Any]) -> List[str]:
@@ -19,9 +17,16 @@ def validate(model: Dict[str, Any]) -> List[str]:
     if len(queue_ids) != len(set(queue_ids)):
         errors.append("Duplicate queue IDs found")
 
+    # Check if next_queues reference valid queue IDs
+    for queue in queues:
+        next_queues = queue.get("next_queue", [])
+        for next_queue in next_queues:
+            target_id = next_queue.get("id")
+            if target_id not in queue_ids and target_id != EXTERNAL_NODE_ID:
+                errors.append(f"Queue '{queue['id']}' points to unknown queue '{target_id}'.")
     return errors
 
-def enforce(model: Dict[str, Any]) -> Dict[str, Any]:
+def enforce(doc: Dict[str, Any]) -> Dict[str, Any]:
     """Finds a model, validates it, and returns a dictionary with the status, assumptions, and errors."""
     assumptions: List[str] = []
     
