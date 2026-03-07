@@ -24,6 +24,13 @@ def validate(model: Dict[str, Any]) -> List[str]:
             target_id = next_queue.get("id")
             if target_id not in queue_ids and target_id != EXTERNAL_NODE_ID:
                 errors.append(f"Queue '{queue['id']}' points to unknown queue '{target_id}'.")
+
+    # Check if probabilities sum to 100 for each queue
+    for queue in queues:
+        next_queues = queue.get("next_queue", [])
+        total_prob = sum(next_queue.get("probability", 0) for next_queue in next_queues)
+        if total_prob != 100:
+            errors.append(f"Routing probabilities for queue '{queue['id']}' sum to {total_prob} instead of 100.")
     return errors
 
 def enforce(doc: Dict[str, Any]) -> Dict[str, Any]:
