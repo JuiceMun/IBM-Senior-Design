@@ -1,6 +1,6 @@
 '''Validation of queue network conversions before sending to data generator'''
 
-from typing import Any, Dict, List, Tuple # for type hints
+from typing import Any, Dict, List # for type hints
 
 EXTERNAL_NODE_ID = "External"
 
@@ -30,6 +30,24 @@ def apply_defaults(model: Dict[str, Any], assumptions: List[str]) -> None:
                 if not queue.get("next_queue"):
                     queue["next_queue"] = [{"id": EXTERNAL_NODE_ID, "probability": 100.0}]
                     assumptions.append(f"Queue '{queue['id']}' had no outgoing edges, so an External exit was added.")
+    
+    # Apply default probabilities if missing (assume equal distribution)
+    for queue in queues:
+        next_queues = queue.get("next_queue", [])
+
+        if not next_queues:
+            continue
+
+        has_missing_prob = any("probability" not in nq for nq in next_queues)
+        total_prob = sum(nq.get("probability", 0) for nq in next_queues)
+        if has_missing_prob or total_prob == 0:
+            even_prob = 100.0 / len(next_queues)
+            
+            for next_queue in next_queues:
+                next_queue["probability"] = even_prob
+            
+            assumptions.append(f"Queue '{queue['id']}' had missing or zero probabilities, so equal probabilities of {even_prob}% were assigned to each outgoing edge.")
+
 
 def validate(model: Dict[str, Any]) -> List[str]:
     """Check logical rules and return a list of error messages. If the list is empty, the model is valid."""
