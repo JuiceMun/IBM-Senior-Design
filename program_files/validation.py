@@ -18,6 +18,19 @@ def apply_defaults(model: Dict[str, Any], assumptions: List[str]) -> None:
         model["entry_points"] = inferred_entry
         assumptions.append(f"No entry point defined, assuming '{inferred_entry}' is the entry point.")
 
+    # Check if exit queue (External) exists, and add if missing
+    has_external = False
+    for queue in queues:
+        for next_queue in queue.get("next_queue", []):
+            if next_queue.get("id") == EXTERNAL_NODE_ID:
+                has_exteral = True
+                break
+        if not has_external:
+            for queue in queues:
+                if not queue.get("next_queue"):
+                    queue["next_queue"] = [{"id": EXTERNAL_NODE_ID, "probability": 100.0}]
+                    assumptions.append(f"Queue '{queue['id']}' had no outgoing edges, so an External exit was added.")
+
 def validate(model: Dict[str, Any]) -> List[str]:
     """Check logical rules and return a list of error messages. If the list is empty, the model is valid."""
     errors: List[str] = []
