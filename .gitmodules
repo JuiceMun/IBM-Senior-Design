@@ -4,6 +4,3 @@
 [submodule "nlip/nlip_server"]
 	path = nlip/nlip_server
 	url = https://github.com/nlip-project/nlip_server
-[submodule "nlip/nlip_web"]
-	path = nlip/nlip_web
-	url = https://github.com/nlip-project/nlip_web
