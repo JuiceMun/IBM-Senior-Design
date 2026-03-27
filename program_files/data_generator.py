@@ -301,3 +301,5 @@ def run(QUEUE_NETWORK_FILE): # Feed in a queue network file
     out_path = Path(out_dir) / f"{queue_name}_data.csv"
     convert_data_to_csv(data, out_path)
     print("Saved to ",out_path)
+
+    return f"{queue_name}_data.csv"
