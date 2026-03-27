@@ -8,6 +8,9 @@ def print_new_section(title:str):
           f"==================\n"
           )
     
+def pause(msg="Press Enter to continue..."):
+    input(f"\n{msg}")
+
 def pipeline():
     # Recommend running the pipeline with the simple_system_description_example.json
 
@@ -34,9 +37,13 @@ def pipeline():
     print_new_section("(2) Queue Network Generated Sucessfully")
     print(f"Converted system description {system_description_name} to {queue_network}")
 
+    pause()
+
     print_new_section("(3) Data Generation")
 
     queue_data_name = data_generator.run(queue_network)
+
+    pause()
 
     print_new_section("(4) Analyzer Output")
 
