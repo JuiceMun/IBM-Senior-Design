@@ -96,7 +96,7 @@ def system_to_queue(system_path: str) -> str:
             "beta": None,
             "entry_points": entry_id,
             "constraint": {
-                "service_rate_sum": 0.0
+                "service_rate_sum": 1.0
             },
             "queues": queues
         }
