@@ -7,6 +7,29 @@ def print_new_section(title:str):
           f"{title}\n"
           f"==================\n"
           )
+    
+def pipeline():
+    """
+    Pipeline: System description -> Queue network -> Generate data -> Analyzer 
+    """
+    system_description = get_files_in_directory("./data/system-description")
+    project_root = Path(__file__).resolve().parent
+
+    print("Choose a system description")
+    for i in range(len(system_description)):
+        print(f"{i} - {system_description[i]}")
+
+    choice = int(input())
+    system_description_name = system_description[choice]
+
+    system_description_path = (
+        project_root / "data" / "system-description" / system_description_name
+    ).resolve()
+
+    output = data_conversion.system_to_queue(str(system_description_path))
+    print(f"Converted system description {system_description_name} to {output}")
+
+
 
 def get_files_in_directory(relative_path: str) -> list[str]:
     """
@@ -172,7 +195,21 @@ def test_data_conversion():
 
 def test_data_generator():
     print_new_section("Data Generator")
-    data_generator.run()
+
+    queue_network = get_files_in_directory("./data/queueing-network")
+    project_root = Path(__file__).resolve().parent
+
+    print("Choose a system description")
+    for i in range(len(queue_network)):
+        print(f"{i} - {queue_network[i]}")
+
+    choice = int(input())
+    queue_network_name = queue_network[choice]
+    queue_network_path = (
+        project_root / "data" / "queueing-network" / queue_network_name
+    ).resolve()
+
+    data_generator.run(queue_network_path)
     input("Press ENTER to continue")
 
 def test_user_input():
@@ -214,7 +251,8 @@ def main():
                     "3: data_generator.py\n"
                     "4: user_input.py\n"
                     "5: ollama_input.py\n"
-                    "6: analyzer.py\n")
+                    "6: analyzer.py\n"
+                    "*: pipeline\n")
 
         if inp == "1":
             test_config()
@@ -228,6 +266,8 @@ def main():
             test_ollama_input()
         elif inp == "6":
             test_analyzer()
+        elif inp == "*":
+            pipeline()
         elif inp == "0":
             print_new_section("Exiting Program")
             break

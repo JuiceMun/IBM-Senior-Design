@@ -261,7 +261,7 @@ def convert_data_to_csv(data, saved_file_path):
 
 
 
-def run():
+def run(QUEUE_NETWORK_FILE): # Feed in a queue network file
     # Load Data Generation Configurations
     cfg = config.get_config("dev_config.ini")
     data_gen_config = cfg['data_generation']
@@ -276,7 +276,7 @@ def run():
     GAUSSIAN_MEAN = data_gen_config.getfloat("gaussian_mean")
     GAUSSIAN_STD = data_gen_config.getfloat("gaussian_std")
     SEED = stress_test_config.getint("random_seed")
-    QUEUE_NETWORK_FILE = cfg.get("paths", "queueing_network_file")
+    # QUEUE_NETWORK_FILE = cfg.get("paths", "queueing_network_file") # Removed
 
     with open(QUEUE_NETWORK_FILE, 'r') as file:
         queue_network = json.load(file)
