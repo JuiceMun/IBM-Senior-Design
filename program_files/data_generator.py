@@ -2,6 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 from program_files import config
+from pathlib import Path
 
 """
 # Load Data Generation Configurations
@@ -294,7 +295,9 @@ def run(QUEUE_NETWORK_FILE): # Feed in a queue network file
         GAUSSIAN_STD
     )
 
+    queue_file = Path(QUEUE_NETWORK_FILE) 
+    queue_name = queue_file.stem # e.g, "queue_diverge_example"
     out_dir = cfg.get("paths", "processed_data_dir")
-    out_path = out_dir+"/diverge_queue_data.csv"
+    out_path = Path(out_dir) / f"{queue_name}_data.csv"
     convert_data_to_csv(data, out_path)
     print("Saved to ",out_path)
