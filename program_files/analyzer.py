@@ -99,7 +99,7 @@ def run(csv_file_name:str):
     # Step 1: Load CSV Data
     # --------------------------------------------------
     cfg = config.get_config("dev_config.ini")
-    data_path = cfg.get("paths","processed_data_dir")+"\\"+csv_file_name
+    data_path = cfg.get("paths","processed_data_dir")+"/"+csv_file_name
     df = pd.read_csv(data_path)
 
     # Dynamically detect queues from CSV

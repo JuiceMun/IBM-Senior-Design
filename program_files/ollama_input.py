@@ -2,9 +2,16 @@ from ollama import chat
 from ollama import ChatResponse
 import json
 import time
+import re
 from program_files.config import _project_root, get_config
 from program_files.data_conversion import validate_json
 from pathlib import Path
+
+def extract_json(response: str) -> str:
+    sys_desc = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", response, re.DOTALL)
+    if not sys_desc:
+        return None
+    return sys_desc.group(1)
 
 def ask_sys_desc():
     """
@@ -31,7 +38,7 @@ def ask_sys_desc():
                 'content': sys_desc
             }
         ])
-        clean_output = response['message']['content'].replace("```json", "").replace("```", "").replace("NULL", "null").strip()
+        clean_output = extract_json(response['message']['content'])
         parsed = json.loads(clean_output)
 
         if isinstance(parsed, list):
@@ -101,4 +108,4 @@ def ask_sys_desc():
 
     if (json_check):
         print("Exited due to too many retries of system description JSON creation...")
-    return response
+    return response, json_file_path

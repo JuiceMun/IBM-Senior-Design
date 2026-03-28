@@ -9,7 +9,7 @@ class ChatApplication(nlip_ext.SafeStatefulApplication):
     def __init__(self):
         super().__init__()
         self.local_port = read_digits("LOCAL_PORT",8020)
-        self.model = read_string("CHAT_MODEL", "llava")
+        self.model = read_string("CHAT_MODEL", "nlip-test-model")
         self.host = read_string("CHAT_HOST", "localhost")
         self.port = read_digits("CHAT_PORT", 11434)
     

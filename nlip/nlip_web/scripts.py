@@ -24,7 +24,7 @@ def start_chat():
     """
     Start the text chat server on port 8010
     """
-    my_env = get_env(local_port=8010, chat_model="granite3-moe")
+    my_env = get_env(local_port=8010, chat_model="nlip-test-model")
     command = f"poetry run python nlip_web/text_chat.py"
     run_command(command, my_env)
 
@@ -32,6 +32,6 @@ def start_image():
     """
     Start the image chat server on port 8020
     """
-    my_env = get_env(local_port=8020, chat_model="llava")
+    my_env = get_env(local_port=8020, chat_model="nlip-test-model")
     command = f"poetry run python nlip_web/image_chat.py"
     run_command(command, my_env)
