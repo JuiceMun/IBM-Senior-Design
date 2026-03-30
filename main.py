@@ -18,30 +18,41 @@ def pipeline():
                       "(1) System description -> (2) Queue Network -> (3) Data Generation -> (4) Analyzer Result")
     
     print_new_section("(1) System description")
-    system_description = get_files_in_directory("./data/system-description")
-    project_root = Path(__file__).resolve().parent
 
-    print("Choose a system description")
-    for i in range(len(system_description)):
-        print(f"{i} - {system_description[i]}")
+    option = int(input("Do you want to use a previous system description? \n"
+                       "(0) - No\n"
+                       "(1) - Yes\n"))
 
-    choice = int(input())
-    system_description_name = system_description[choice]
+    if option == 1:
+        system_description = get_files_in_directory("./data/system-description")
+        project_root = Path(__file__).resolve().parent
 
-    system_description_path = (
-        project_root / "data" / "system-description" / system_description_name
-    ).resolve()
+        print("Choose a system description")
+        for i in range(len(system_description)):
+            print(f"{i} - {system_description[i]}")
+
+        choice = int(input())
+        system_description_name = system_description[choice]
+
+        system_description_path = (
+            project_root / "data" / "system-description" / system_description_name
+        ).resolve()
+
+    else:
+        system_description, system_description_path = ollama_input.ask_sys_desc()
 
     queue_network = data_conversion.system_to_queue(str(system_description_path))
 
     print_new_section("(2) Queue Network Generated Sucessfully")
-    print(f"Converted system description {system_description_name} to {queue_network}")
+    print(f"Converted system description {system_description_path} to {queue_network}")
 
     pause()
 
     print_new_section("(3) Data Generation")
 
     queue_data_name = data_generator.run(queue_network)
+
+    print(queue_data_name)
 
     pause()
 

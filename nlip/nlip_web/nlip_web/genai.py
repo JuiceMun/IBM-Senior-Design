@@ -34,7 +34,7 @@ class GenAI:
 
 
 class OllamaClient(GenAI):
-    def __init__(self, host: str = "localhost", port: int = 11434, model="mistral"):
+    def __init__(self, host: str = "localhost", port: int = 11434, model="nlip-test-model"):
         self.host = host
         self.port = port
         self.model = model
@@ -114,7 +114,7 @@ A Convenience class which remembers previous interactions as context.
 
 class StatefulGenAI:
     def __init__(
-        self, host: str = "localhost", port: int = 11434, model: str = "mistral"
+        self, host: str = "localhost", port: int = 11434, model: str = "nlip-test-model"
     ):
         self.server = OllamaClient(host=host, port=port, model=model)
         self.history = list()
