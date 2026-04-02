@@ -23,13 +23,13 @@ def apply_defaults(model: Dict[str, Any], assumptions: List[str]) -> None:
     for queue in queues:
         for next_queue in queue.get("next_queue", []):
             if next_queue.get("id") == EXTERNAL_NODE_ID:
-                has_exteral = True
+                has_external = True
                 break
-        if not has_external:
-            for queue in queues:
-                if not queue.get("next_queue"):
-                    queue["next_queue"] = [{"id": EXTERNAL_NODE_ID, "probability": 100.0}]
-                    assumptions.append(f"Queue '{queue['id']}' had no outgoing edges, so an External exit was added.")
+    if not has_external:
+        for queue in queues:
+            if not queue.get("next_queue"):
+                queue["next_queue"] = [{"id": EXTERNAL_NODE_ID, "probability": 100.0}]
+                assumptions.append(f"Queue '{queue['id']}' had no outgoing edges, so an External exit was added.")
     
     # Apply default probabilities if missing (assume equal distribution)
     for queue in queues:
